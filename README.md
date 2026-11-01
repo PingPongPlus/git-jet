@@ -1,6 +1,6 @@
 # Git Jet
 
-A pixel jet launches from a carrier, banks over your real commit calendar, and
+A pixel jet(multiple jets also possible) launches from a carrier, banks over your real commit calendar, and
 destroys each active day's cell. Transparent background, waves, projectiles and
 pixel explosions. Runs with GitHub Actions.
 
