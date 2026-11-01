@@ -9,7 +9,17 @@
   "active_days": 14,
   "attacks": 14,
   "attack_mode": "day-cell",
+  "jets": 1,
   "seed": "git-jet-loop",
+  "flights": [
+    {
+      "jet": 1,
+      "seed": "git-jet-loop",
+      "attacks": 14,
+      "launch_frame": 8,
+      "landed_frame": 480
+    }
+  ],
   "maneuvers": [
     {
       "kind": "loop",
@@ -20,15 +30,20 @@
   ],
   "width": 960,
   "height": 640,
+  "scale": 2,
+  "requested_scale": 2,
+  "requested_fps": 20,
+  "auto_compressed": false,
   "frames": 560,
   "fps": 20,
   "duration_seconds": 28.0,
   "transparent": true,
   "decoded_frames_match": true,
-  "gif_bytes": 8418853,
+  "gif_bytes": 8420269,
   "targets": [
     {
       "date": "2026-10-18",
+      "jet": 1,
       "commits": 6,
       "column": 50,
       "row": 0,
@@ -37,6 +52,7 @@
     },
     {
       "date": "2026-10-30",
+      "jet": 1,
       "commits": 7,
       "column": 51,
       "row": 5,
@@ -45,6 +61,7 @@
     },
     {
       "date": "2026-09-30",
+      "jet": 1,
       "commits": 5,
       "column": 47,
       "row": 3,
@@ -53,6 +70,7 @@
     },
     {
       "date": "2026-09-01",
+      "jet": 1,
       "commits": 4,
       "column": 43,
       "row": 2,
@@ -61,6 +79,7 @@
     },
     {
       "date": "2026-08-03",
+      "jet": 1,
       "commits": 3,
       "column": 39,
       "row": 1,
@@ -69,6 +88,7 @@
     },
     {
       "date": "2026-07-02",
+      "jet": 1,
       "commits": 2,
       "column": 34,
       "row": 4,
@@ -77,6 +97,7 @@
     },
     {
       "date": "2026-04-12",
+      "jet": 1,
       "commits": 6,
       "column": 23,
       "row": 0,
@@ -85,6 +106,7 @@
     },
     {
       "date": "2026-03-16",
+      "jet": 1,
       "commits": 5,
       "column": 19,
       "row": 1,
@@ -93,6 +115,7 @@
     },
     {
       "date": "2026-05-10",
+      "jet": 1,
       "commits": 7,
       "column": 27,
       "row": 0,
@@ -101,6 +124,7 @@
     },
     {
       "date": "2026-06-03",
+      "jet": 1,
       "commits": 1,
       "column": 30,
       "row": 3,
@@ -109,6 +133,7 @@
     },
     {
       "date": "2026-02-04",
+      "jet": 1,
       "commits": 4,
       "column": 13,
       "row": 3,
@@ -117,6 +142,7 @@
     },
     {
       "date": "2026-01-13",
+      "jet": 1,
       "commits": 3,
       "column": 10,
       "row": 2,
@@ -125,6 +151,7 @@
     },
     {
       "date": "2025-12-16",
+      "jet": 1,
       "commits": 2,
       "column": 6,
       "row": 2,
@@ -133,6 +160,7 @@
     },
     {
       "date": "2025-11-16",
+      "jet": 1,
       "commits": 1,
       "column": 2,
       "row": 0,

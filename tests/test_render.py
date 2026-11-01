@@ -62,7 +62,7 @@ def test_zero_commits_patrol_has_no_targets_or_fabricated_hits():
         assert set(renderer.frame(frame).getchannel("A").tobytes()) == {0, 255}
 
 
-def test_production_art_is_pixel_identical_to_the_approved_studies():
+def test_production_art_preserves_approved_studies_outside_the_rotating_radar():
     spec = importlib.util.spec_from_file_location(
         "approved_art", ROOT / "artwork/drafts/sprites.py"
     )
@@ -71,7 +71,11 @@ def test_production_art_is_pixel_identical_to_the_approved_studies():
     with Image.open(ROOT / "artwork/drafts/output/carrier-transparent.png") as reference:
         assert art.carrier_sprite().tobytes() == reference.tobytes()
     for phase in (0, 0.12, 0.5, 0.95):
-        assert art.carrier_sprite(phase).tobytes() == approved.carrier_sprite(phase).tobytes()
+        current, original = art.carrier_sprite(phase), approved.carrier_sprite(phase)
+        x, y = art.project(185, 10, 60)
+        radar = (x - 7, y - 23, x + 9, y - 12)
+        original.paste(current.crop(radar), radar[:2])
+        assert current.tobytes() == original.tobytes()
     for heading in (i * 22.5 for i in range(16)):
         for bank in (-1, 0, 1):
             for thrust in (0, 1, 2):

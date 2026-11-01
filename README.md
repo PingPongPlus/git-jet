@@ -2,11 +2,11 @@
 
 A pixel jet(multiple jets also possible) launches from a carrier, banks over your real commit calendar, and
 destroys each active day's cell. Transparent background, waves, projectiles and
-pixel explosions. Runs with GitHub Actions.
+pixel explosions and a continuously spinning carrier radar. Runs with GitHub Actions.
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=random-flight-20261101">
-  <img src="examples/demo/git-jet.gif?v=random-flight-20261101" width="960" alt="A pixel jet launches from an angled carrier, loops while firing and clears the commit calendar below it.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=radar-spinner-20261102">
+  <img src="examples/demo/git-jet.gif?v=radar-spinner-20261102" width="960" alt="A pixel jet launches from an angled carrier with a spinning radar, loops while firing and clears the commit calendar below it.">
 </picture>
 
 The demo uses **56 synthetic commits across 14 active days**. Live mode uses your

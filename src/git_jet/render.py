@@ -1,4 +1,4 @@
-"""Transparent native-grid scene assembled exclusively from the approved art."""
+"""Transparent native-grid scene using carrier, jet and effect sprites."""
 
 import math
 
