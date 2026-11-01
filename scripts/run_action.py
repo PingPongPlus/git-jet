@@ -19,6 +19,9 @@ def run():
         demo = os.environ.get("JET_DEMO", "false").strip().lower()
         if demo not in ("true", "false"):
             raise ValueError("demo must be true or false")
+        auto_compress = os.environ.get("JET_AUTO_COMPRESS", "true").strip().lower()
+        if auto_compress not in ("true", "false"):
+            raise ValueError("auto-compress must be true or false")
         args = [
             "render",
             "--output-dir",
@@ -37,6 +40,8 @@ def run():
         seed = os.environ.get("JET_SEED", "")
         if seed:
             args += ["--seed", seed]
+        if auto_compress == "false":
+            args += ["--no-auto-compress"]
         code = main(args)
         if code:
             return code

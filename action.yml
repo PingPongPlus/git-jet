@@ -26,6 +26,9 @@ inputs:
   jets:
     description: Number of jets, 1 to 3; more jets share targets to shorten busy calendars
     default: '1'
+  auto-compress:
+    description: Automatically lower scale then FPS to fit GIF limits without skipping day cells
+    default: 'true'
   demo:
     description: Use the synthetic offline demo instead of live data (for verification)
     default: 'false'
@@ -61,6 +64,7 @@ runs:
         JET_SCALE: ${{ inputs.scale }}
         JET_FPS: ${{ inputs.fps }}
         JET_JETS: ${{ inputs.jets }}
+        JET_AUTO_COMPRESS: ${{ inputs.auto-compress }}
         JET_DEMO: ${{ inputs.demo }}
         JET_SEED: ${{ inputs.seed }}
         JET_OUTPUT_DIR: ${{ inputs.output-dir }}

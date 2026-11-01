@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 from .art import project
 from .calendar import Calendar, Cell
+from .limits import FrameLimitError
 
 WIDTH, HEIGHT = 480, 320
 GRID_X, GRID_Y, GRID_STEP = 28, 237, 8
@@ -305,7 +306,7 @@ class Flight:
             math.ceil((self.reset_start + self.reset_frames + round(0.3 * fps)) / cycle) * cycle
         )
         if self.frame_count > 3000:
-            raise ValueError("flight exceeds the 3000-frame export limit; select fewer days")
+            raise FrameLimitError("flight exceeds the 3000-frame export limit; select fewer days")
 
     def _strikes(self, calendar, targets=None):
         if targets is None:
@@ -463,7 +464,7 @@ class Squadron:
             * 4
         )
         if self.frame_count > 3000:
-            raise ValueError("flight exceeds the 3000-frame export limit; select fewer days")
+            raise FrameLimitError("flight exceeds the 3000-frame export limit; select fewer days")
 
     def restored(self, cell, frame):
         return frame >= self.reset_start + (cell.column / 53) * self.reset_frames

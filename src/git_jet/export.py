@@ -13,7 +13,9 @@ from pathlib import Path
 from PIL import GifImagePlugin, Image, ImageChops
 
 from . import art
-from .flight import HEIGHT, WIDTH
+from .calendar import Calendar
+from .flight import HEIGHT, WIDTH, route_seed
+from .limits import FrameLimitError, GifSizeLimitError
 from .render import Renderer
 
 ASSETS = ("git-jet.gif", "git-jet.png", "report.json", "calendar.json")
@@ -78,11 +80,19 @@ def verify(path: Path, renderer: Renderer, options: Options):
                 raise ValueError("GIF timing or transparent cleanup changed")
 
 
-def export(renderer: Renderer, output: Path, options: Options, *, source="live"):
+def export(
+    renderer: Renderer,
+    output: Path,
+    options: Options,
+    *,
+    source="live",
+    requested_options: Options | None = None,
+):
     if renderer.flight.fps != options.fps:
         raise ValueError("renderer FPS differs from export FPS; rebuild the renderer")
     if renderer.frame_count * WIDTH * HEIGHT > 460_800_000:
-        raise ValueError("animation exceeds the render budget; select fewer days")
+        raise FrameLimitError("animation exceeds the render budget; select fewer days")
+    requested_options = requested_options or options
     output.mkdir(parents=True, exist_ok=True)
     mapping, rgb = palette()
     with tempfile.TemporaryDirectory(prefix=".git-jet-", dir=output) as scratch:
@@ -99,8 +109,8 @@ def export(renderer: Renderer, output: Path, options: Options, *, source="live")
                     frame, duration=1000 // options.fps, disposal=2, transparency=0
                 ):
                     stream.write(block)
-                if stream.tell() > MAX_BYTES:
-                    raise ValueError("GIF exceeds 25 MB; reduce scale or the selected days")
+                if stream.tell() + 1 > MAX_BYTES:
+                    raise GifSizeLimitError("GIF exceeds 25 MB; reduce scale or the selected days")
             stream.write(b";")
         first = renderer.frame(0).resize(
             (WIDTH * options.scale, HEIGHT * options.scale), Image.Resampling.NEAREST
@@ -134,6 +144,10 @@ def export(renderer: Renderer, output: Path, options: Options, *, source="live")
             "maneuvers": renderer.flight.maneuvers,
             "width": WIDTH * options.scale,
             "height": HEIGHT * options.scale,
+            "scale": options.scale,
+            "requested_scale": requested_options.scale,
+            "requested_fps": requested_options.fps,
+            "auto_compressed": options != requested_options,
             "frames": renderer.frame_count,
             "fps": options.fps,
             "duration_seconds": renderer.frame_count / options.fps,
@@ -157,3 +171,57 @@ def export(renderer: Renderer, output: Path, options: Options, *, source="live")
         for name in ASSETS:
             os.replace(root / name, output / name)
     return report
+
+
+def render_assets(
+    calendar: Calendar,
+    output: Path,
+    options: Options,
+    *,
+    jets=1,
+    seed=None,
+    source="live",
+    auto_compress=True,
+):
+    """Fit the same complete calendar and seed, lowering scale before FPS."""
+    seed = route_seed(seed)
+    rates = [options.fps]
+    if auto_compress:
+        rates += [fps for fps in (25, 20, 10, 5) if fps < options.fps]
+    attempt = 0
+    for fps in rates:
+        try:
+            renderer = Renderer(calendar, fps=fps, seed=seed, jets=jets)
+            scales = (
+                range(options.scale, 0, -1)
+                if auto_compress and fps == options.fps
+                else (1,)
+                if auto_compress
+                else (options.scale,)
+            )
+            for scale in scales:
+                if attempt:
+                    print(
+                        f"git-jet: retrying at {WIDTH * scale}x{HEIGHT * scale}, "
+                        f"{fps} FPS to fit GIF limits; all day-cell attacks are retained",
+                        file=sys.stderr,
+                    )
+                attempt += 1
+                try:
+                    return export(
+                        renderer,
+                        output,
+                        Options(scale, fps),
+                        source=source,
+                        requested_options=options,
+                    )
+                except GifSizeLimitError:
+                    if not auto_compress:
+                        raise
+        except FrameLimitError:
+            if not auto_compress:
+                raise
+            attempt += 1
+    raise GifSizeLimitError(
+        "animation cannot fit the GIF limits even at native scale and 5 FPS; select fewer days"
+    )

@@ -42,6 +42,11 @@ is still attacked exactly once. Launches are staggered and the calendar resets
 after every jet lands. Small calendars may take a similar time because launch
 and return flights still need to finish. For the CLI, use `--jets 3`.
 
+GIFs over **25 MB** are automatically retried at a lower resolution, then lower
+FPS if needed. Every day-cell attack is kept. To help keep your requested
+resolution, use more jets (`jets: '3'`) to shorten the animation. Disable this
+fallback with `auto-compress: 'false'` or CLI `--no-auto-compress`.
+
 Every generation picks a fresh route with varied sweeps, gentle bends and
 occasional small loops while shooting. To keep a favorite route, set
 `seed: 'my-route'` in the action or use CLI `--seed my-route`. Omit the seed for
@@ -72,8 +77,8 @@ It can differ from GitHub's broader profile contribution calendar.
 
 Each active day gets one visible attack; flight length grows with active days.
 No targets are silently sampled or skipped. Empty calendars get a patrol with
-no shots. Export is bounded to 3,000 frames and 25 MB per GIF; use fewer days or a
-lower scale if needed. Failed generation preserves previously good assets.
+no shots. Export is bounded to 3,000 frames and 25 MB per GIF. If even the smallest
+render cannot fit, select fewer days. Failed generation preserves previously good assets.
 
 Generation and publication are separate. The publisher updates only `git-jet.gif`
 and `git-jet.png` on `output`, preserves other files, uses non-force pushes and

@@ -17,6 +17,7 @@ def test_action_forwards_inputs_and_writes_only_successful_output(monkeypatch, t
     monkeypatch.setenv("JET_USERNAME", "octocat")
     monkeypatch.setenv("JET_DAYS", "30")
     monkeypatch.setenv("JET_JETS", "3")
+    monkeypatch.setenv("JET_AUTO_COMPRESS", "false")
     monkeypatch.setenv("JET_OUTPUT_DIR", "generated")
     monkeypatch.setenv("JET_SEED", "reproducible-action-route")
     args = []
@@ -31,6 +32,7 @@ def test_action_forwards_inputs_and_writes_only_successful_output(monkeypatch, t
     assert args[args.index("--username") + 1] == "octocat"
     assert args[args.index("--days") + 1] == "30"
     assert args[args.index("--jets") + 1] == "3"
+    assert "--no-auto-compress" in args
     assert args[args.index("--seed") + 1] == "reproducible-action-route"
     outputs = dict(line.split("=", 1) for line in (tmp_path / "outputs").read_text().splitlines())
     assert outputs["calendar"] == str(tmp_path / "generated/calendar.json")
@@ -42,6 +44,14 @@ def test_action_forwards_inputs_and_writes_only_successful_output(monkeypatch, t
 def test_action_rejects_output_escape_before_collecting(monkeypatch, tmp_path):
     monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
     monkeypatch.setenv("JET_OUTPUT_DIR", "../outside")
+    monkeypatch.setattr(action, "main", lambda argv: (_ for _ in ()).throw(AssertionError()))
+    assert action.run() == 1
+
+
+def test_action_rejects_invalid_auto_compress_before_collecting(monkeypatch, tmp_path):
+    monkeypatch.setenv("GITHUB_WORKSPACE", str(tmp_path))
+    monkeypatch.setenv("JET_REPOSITORY_OWNER", "octocat")
+    monkeypatch.setenv("JET_AUTO_COMPRESS", "maybe")
     monkeypatch.setattr(action, "main", lambda argv: (_ for _ in ()).throw(AssertionError()))
     assert action.run() == 1
 
@@ -71,6 +81,7 @@ def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path):
             "JET_OUTPUT_DIR": "rendered",
             "JET_SEED": "action-smoke",
             "JET_JETS": "3",
+            "JET_AUTO_COMPRESS": "true",
             "GITHUB_TOKEN": "never-save-this-test-token",
         },
         text=True,

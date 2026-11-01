@@ -9,9 +9,8 @@ from pathlib import Path
 
 from .calendar import Calendar
 from .demo import demo_calendar
-from .export import Options, export
+from .export import Options, render_assets
 from .github import GitHubClient, GitHubError
-from .render import Renderer
 
 
 def main(argv=None):
@@ -35,6 +34,12 @@ def main(argv=None):
         "--jets", type=int, choices=(1, 2, 3), default=1, help="simultaneous jets (default: 1)"
     )
     render.add_argument("--seed", help="reproduce a route; omit for fresh randomness on each run")
+    render.add_argument(
+        "--auto-compress",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="lower scale, then FPS when needed to fit GIF limits (default: enabled)",
+    )
     render.add_argument("--output-dir", type=Path, default=Path("out"))
     args = parser.parse_args(argv)
     try:
@@ -60,11 +65,14 @@ def main(argv=None):
                 source_name = "live"
             if args.end_date is not None and calendar.days[-1].date != args.end_date:
                 raise ValueError("calendar observation date differs; collect fresh data")
-            report = export(
-                Renderer(calendar, fps=options.fps, seed=args.seed, jets=args.jets),
+            report = render_assets(
+                calendar,
                 args.output_dir,
                 options,
+                jets=args.jets,
+                seed=args.seed,
                 source=source_name,
+                auto_compress=args.auto_compress,
             )
             print(json.dumps(report, indent=2))
             return 0
