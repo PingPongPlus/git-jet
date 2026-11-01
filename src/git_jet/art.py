@@ -1,4 +1,4 @@
-"""Carrier revision 2, jet and effects approved by the owner on 2026-11-01."""
+"""Approved base sprites; the rotating radar is pending owner review."""
 
 import math
 
@@ -68,6 +68,22 @@ def jet_sprite(heading=0, thrust=0, bank=0):
     draw.line(points([(-3, 23), (-1, 22)]), fill=LIGHT)
     draw.line(points([(3, 23), (1, 22)]), fill=SHADE)
     return image.rotate(-heading, resample=Image.Resampling.NEAREST)
+
+
+def radar_sprite(t=0):
+    """Turn the existing mast antenna around its spindle once per scene cycle."""
+    image = Image.new("RGBA", (16, 11))
+    angle = math.tau * (t % 1)
+    dx, dy = 5.5 * math.cos(angle), 2.5 * math.sin(angle)
+    # Foreshortening and the shaded back face make the whole turn readable.
+    vertices = [
+        (round(7.5 - dx), round(5 - dy - 1)),
+        (round(7.5 + dx), round(5 + dy - 1)),
+        (round(7.5 + dx), round(5 + dy + 1)),
+        (round(7.5 - dx), round(5 - dy + 1)),
+    ]
+    ImageDraw.Draw(image).polygon(vertices, fill=CREAM if math.cos(angle) >= 0 else LIGHT)
+    return image
 
 
 def carrier_sprite(t=0):
@@ -294,7 +310,7 @@ def carrier_sprite(t=0):
     draw.line((x, y, x, y - 22), fill=INK, width=2)
     draw.line((x + 1, y - 2, x + 1, y - 20), fill=LIGHT)
     draw.line((x - 9, y - 12, x + 8, y - 12), fill=SHADE)
-    draw.rectangle((x - 5, y - 19, x + 6, y - 17), fill=CREAM)
+    image.alpha_composite(radar_sprite(t), (x - 7, y - 23))
     draw.line((x - 3, y - 22, x - 3, y - 25), fill=LIGHT)
     draw.point((x - 3, y - 26), fill=GOLD)
     draw.line((x + 6, y - 9, x + 6, y - 15), fill=LIGHT)

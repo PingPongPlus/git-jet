@@ -1,11 +1,14 @@
-# Verification — 2026-11-01
+# Verification — 2026-11-02
 
-- All carrier revision 2, jet, graph and effects artwork was approved by the owner.
-- Production art is checked against the approved draft sprites and carrier PNG.
-- 125 local tests pass on Python 3.15 / Pillow 13. Lint and formatting pass.
+- Base carrier revision 2, jet, graph and effects artwork was approved by the owner.
+  The radar animation awaits owner review on `radar-spinner` before merging.
+- Production art is checked against the approved draft sprites and carrier PNG;
+  only the rotating antenna region differs during animation. The initial frame
+  remains pixel-identical to the approved carrier.
+- 130 local tests pass on Python 3.15 / Pillow 13. Lint and formatting pass.
 - Source distribution and wheel build; the installed wheel's CLI renders offline.
 - The seeded demo (`git-jet-loop`) exports at 960×640, 560 frames, 28 seconds at
-  20 FPS (8,418,853 bytes), with 56 synthetic
+  20 FPS (8,420,269 bytes), with 56 synthetic
   commits on 14 active days and exactly 14 attacks. Every decoded GIF frame
   matches its intended colors, binary transparency, timing and cleanup.
 - Live public collection for PingPongPlus returned 99 distinct authored commits
@@ -40,10 +43,15 @@
   then supported lower frame rates. Tests cover a real oversized export,
   one collection and one seed across retries, all targets retained, frame-limit
   recovery, opt-out, unrelated errors, and preserving prior assets if nothing fits.
-  The orhun single-jet render automatically falls from 960×640 to 480×320 at
+  Before the radar update, the orhun single-jet render automatically fell from 960×640 to 480×320 at
   20 FPS, retains all 325 attacks and 1,124 commits, and produces a 17,014,564-byte
   GIF identical to the earlier manually configured render. Reports record the
   requested and final scale/FPS and whether automatic reduction was used.
+- The existing mast antenna makes one full turn every four seconds, with
+  foreshortened edge views and a shaded back face. Radar tests check the complete
+  loop, hard transparent pixel edges, unchanged timing at 5/10/20/25 FPS, and
+  continuous rotation through flight and landing. Review GIF and angle sheet
+  can be regenerated with `PYTHONPATH=src python scripts/preview_radar.py`.
 - CI runs verification and an offline composite-action smoke render on pushes
   and pull requests. The profile-workflow template schedules daily generation.
 
