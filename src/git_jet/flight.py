@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import bisect
+import hashlib
 import math
 import random
 import secrets
@@ -32,6 +33,12 @@ def sprite_heading(angle):
 
 def centre(cell: Cell):
     return GRID_X + cell.column * GRID_STEP + 3, GRID_Y + cell.row * GRID_STEP + 3
+
+
+def route_seed(seed):
+    if seed is not None and (not isinstance(seed, str) or not 1 <= len(seed) <= 128):
+        raise ValueError("seed must be a string of 1..128 characters")
+    return seed if seed is not None else secrets.token_hex(8)
 
 
 @dataclass(frozen=True)
@@ -210,6 +217,7 @@ class Strike:
     origin: tuple[float, float]
     target: tuple[int, int]
     direction: tuple[float, float]
+    jet_id: int = 0
 
     def projectile(self, t):
         """Leave the moving jet's nose, then bend toward the selected day cell."""
@@ -227,11 +235,10 @@ class Strike:
 
 
 class Flight:
-    def __init__(self, calendar: Calendar, fps=20, seed=None):
+    def __init__(self, calendar: Calendar, fps=20, seed=None, *, targets=None, delay=0, jet_id=0):
         self.fps = fps
-        if seed is not None and (not isinstance(seed, str) or not 1 <= len(seed) <= 128):
-            raise ValueError("seed must be a string of 1..128 characters")
-        self.seed = seed if seed is not None else secrets.token_hex(8)
+        self.seed = route_seed(seed)
+        self.jet_id = jet_id
         rng = random.Random(self.seed)
         top = rng.uniform(201, 207)
         height = rng.uniform(68, 76)
@@ -250,12 +257,12 @@ class Flight:
         self.course = course(entry[0], rng, top, height)
         self.lap_frames = math.ceil(self.course.length / CRUISE_SPEED * fps)
         self.step = self.course.length / self.lap_frames
-        self.launch_start = round(0.4 * fps)
+        self.launch_start = round(0.4 * fps) + delay
         self.launch_frames = math.ceil(2 * math.dist(self.deck, self.bow) / (self.step * fps) * fps)
         self.launch_end = self.launch_start + self.launch_frames
         self.departure_frames = math.ceil(self.departure.length / self.step)
         self.cruise_start = self.launch_end + self.departure_frames
-        self.strikes = self._strikes(calendar)
+        self.strikes = self._strikes(calendar, targets)
         last_fire = max((s.fire for s in self.strikes), default=self.cruise_start)
         laps = max(1, (last_fire - self.cruise_start) // self.lap_frames + 1)
         self.cruise_end = self.cruise_start + laps * self.lap_frames
@@ -300,8 +307,9 @@ class Flight:
         if self.frame_count > 3000:
             raise ValueError("flight exceeds the 3000-frame export limit; select fewer days")
 
-    def _strikes(self, calendar):
-        targets = [c for c in calendar.cells() if c.day and c.day.commits]
+    def _strikes(self, calendar, targets=None):
+        if targets is None:
+            targets = [c for c in calendar.cells() if c.day and c.day.commits]
         poses = [self.course.pose(frame * self.step) for frame in range(self.lap_frames)]
         loop_frames = {
             frame
@@ -366,7 +374,9 @@ class Flight:
             origin = pose.x + direction[0] * 15, pose.y + direction[1] * 15
             target = centre(cell)
             duration = max(3, round((0.22 + math.dist(origin, target) / 240) * self.fps))
-            strikes.append(Strike(cell, fire, fire + duration, origin, target, direction))
+            strikes.append(
+                Strike(cell, fire, fire + duration, origin, target, direction, self.jet_id)
+            )
         return sorted(strikes, key=lambda strike: strike.hit)
 
     def pose(self, frame):
@@ -403,3 +413,66 @@ class Flight:
 
     def restored(self, cell, frame):
         return frame >= self.reset_start + (cell.column / 53) * self.reset_frames
+
+    def visible_poses(self, frame):
+        return (self.pose(frame),)
+
+
+class Squadron:
+    """Share day-cell targets across independently seeded, staggered sorties."""
+
+    def __init__(self, calendar: Calendar, jets: int, fps=20, seed=None):
+        if type(jets) is not int or not 1 <= jets <= 3:
+            raise ValueError("jets must be an integer in 1..3")
+        self.fps = fps
+        self.seed = route_seed(seed)
+        targets = [c for c in calendar.cells() if c.day and c.day.commits]
+        self.flights = []
+        delay = 0
+        for index in range(jets):
+            child_seed = (
+                self.seed
+                if index == 0
+                else hashlib.sha256(f"{self.seed}:jet:{index}".encode()).hexdigest()
+            )
+            flight = Flight(
+                calendar,
+                fps,
+                child_seed,
+                targets=targets[index::jets],
+                delay=delay,
+                jet_id=index,
+            )
+            self.flights.append(flight)
+            # The next jet enters the catapult after the previous aircraft clears it.
+            delay = flight.launch_end + round(0.35 * fps) - round(0.4 * fps)
+        self.strikes = sorted(
+            (s for flight in self.flights for s in flight.strikes), key=lambda s: s.hit
+        )
+        self.maneuvers = [
+            {**maneuver, "jet": flight.jet_id + 1}
+            for flight in self.flights
+            for maneuver in flight.maneuvers
+        ]
+        self.landed = max(f.landed for f in self.flights)
+        self.reset_start = self.landed + round(0.3 * fps)
+        self.reset_frames = round(0.8 * fps)
+        self.frame_count = (
+            math.ceil((self.reset_start + self.reset_frames + round(0.3 * fps)) / (fps * 4))
+            * fps
+            * 4
+        )
+        if self.frame_count > 3000:
+            raise ValueError("flight exceeds the 3000-frame export limit; select fewer days")
+
+    def restored(self, cell, frame):
+        return frame >= self.reset_start + (cell.column / 53) * self.reset_frames
+
+    def visible_poses(self, frame):
+        if frame >= self.landed:
+            return (self.flights[0].pose(0),)
+        return tuple(
+            flight.pose(frame)
+            for index, flight in enumerate(self.flights)
+            if (index == 0 or frame >= self.flights[index - 1].launch_end) and frame < flight.landed
+        )

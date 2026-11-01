@@ -2,7 +2,7 @@
 
 - All carrier revision 2, jet, graph and effects artwork was approved by the owner.
 - Production art is checked against the approved draft sprites and carrier PNG.
-- 80 local tests pass on Python 3.15 / Pillow 13. Lint and formatting pass.
+- 117 local tests pass on Python 3.15 / Pillow 13. Lint and formatting pass.
 - Source distribution and wheel build; the installed wheel's CLI renders offline.
 - The seeded demo (`git-jet-loop`) exports at 960×640, 560 frames, 28 seconds at
   20 FPS (8,418,853 bytes), with 56 synthetic
@@ -26,6 +26,16 @@
   loops. Explicit seeds reproduce poses and attack schedules, and are recorded
   in the report. Loop routes schedule a real day-cell attack during the maneuver.
   Five seeded full-year cases retain all 365 targets within the frame limit.
+- Optional 1–3 jets keep single-jet behavior as the default. Squadron tests cover
+  disjoint, balanced targets; staggered launches; simultaneous visible aircraft;
+  projectile origins; smooth motion; shared reset after all landings; empty and
+  sparse calendars; seed replay; and every supported FPS. Two and three jets
+  shorten dense full-year calendars across five route seeds without losing targets.
+- The orhun public-data snapshot has 1,124 commits on 325 active days for
+  2025-11-02 through 2026-11-01. With seed `47f76d98ee2f6d5c`, three jets export
+  at 960×640, 20 FPS, 1,360 frames, 68 seconds and 23,416,497 bytes. All decoded
+  frames match, all 325 dates receive one attack, and their counts still total
+  1,124. The same seed with one jet takes 124 seconds.
 - CI runs verification and an offline composite-action smoke render on pushes
   and pull requests. The profile-workflow template schedules daily generation.
 

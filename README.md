@@ -36,6 +36,12 @@ smooth curves at a steady cruise speed and fires while moving. The default is
 20 FPS; `fps: '10'` makes smaller files while preserving flight speed. Set
 `scale: '1'` for smaller images.
 
+Set `jets: '2'` or `jets: '3'` to launch multiple jets and clear busy calendars
+faster. The default is `jets: '1'`. Jets share the day cells, so each active day
+is still attacked exactly once. Launches are staggered and the calendar resets
+after every jet lands. Small calendars may take a similar time because launch
+and return flights still need to finish. For the CLI, use `--jets 3`.
+
 Every generation picks a fresh route with varied sweeps, gentle bends and
 occasional small loops while shooting. To keep a favorite route, set
 `seed: 'my-route'` in the action or use CLI `--seed my-route`. Omit the seed for
@@ -78,6 +84,7 @@ never changes your default branch. Publishing requires `contents: write`.
 - [x] Approved carrier, parked aircraft, waves, directional jets, grid and effects.
 - [x] Real commit collection, transparent GIF/PNG export and a daily Actions template.
 - [x] Catapult launch, banked flight, one attack per active day and carrier return.
+- [x] Optional 1–3 jets to share targets and shorten busy calendars.
 - [ ] Optional **one shot per individual commit** mode.
 - [ ] More carrier/jet designs and configurable graph palettes, with artwork approval.
 

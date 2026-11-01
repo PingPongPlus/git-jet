@@ -119,7 +119,18 @@ def export(renderer: Renderer, output: Path, options: Options, *, source="live")
             "active_days": len(renderer.flight.strikes),
             "attacks": len(renderer.flight.strikes),
             "attack_mode": "day-cell",
+            "jets": renderer.jet_count,
             "seed": renderer.flight.seed,
+            "flights": [
+                {
+                    "jet": flight.jet_id + 1,
+                    "seed": flight.seed,
+                    "attacks": len(flight.strikes),
+                    "launch_frame": flight.launch_start,
+                    "landed_frame": flight.landed,
+                }
+                for flight in renderer.flights
+            ],
             "maneuvers": renderer.flight.maneuvers,
             "width": WIDTH * options.scale,
             "height": HEIGHT * options.scale,
@@ -132,6 +143,7 @@ def export(renderer: Renderer, output: Path, options: Options, *, source="live")
             "targets": [
                 {
                     "date": s.cell.day.date.isoformat(),
+                    "jet": s.jet_id + 1,
                     "commits": s.cell.day.commits,
                     "column": s.cell.column,
                     "row": s.cell.row,

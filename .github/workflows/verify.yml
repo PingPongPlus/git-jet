@@ -37,6 +37,7 @@ jobs:
           demo: 'true'
           scale: '1'
           seed: action-smoke
+          jets: '3'
           output-dir: action-smoke
           token: ''
       - name: Verify generated paths

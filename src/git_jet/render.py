@@ -6,14 +6,32 @@ from PIL import Image, ImageDraw
 
 from .art import CREAM, GOLD, carrier_sprite, commit_tile, explosion_sprite, jet_sprite
 from .calendar import Calendar
-from .flight import GRID_STEP, GRID_X, GRID_Y, HEADING_STEPS, HEIGHT, WIDTH, Flight, sprite_heading
+from .flight import (
+    GRID_STEP,
+    GRID_X,
+    GRID_Y,
+    HEADING_STEPS,
+    HEIGHT,
+    WIDTH,
+    Flight,
+    Squadron,
+    sprite_heading,
+)
 
 
 class Renderer:
-    def __init__(self, calendar: Calendar, fps=20, seed=None):
+    def __init__(self, calendar: Calendar, fps=20, seed=None, jets=1):
+        if type(jets) is not int or not 1 <= jets <= 3:
+            raise ValueError("jets must be an integer in 1..3")
+        self.jet_count = jets
         self.calendar = calendar
         self.cells = calendar.cells()
-        self.flight = Flight(calendar, fps, seed=seed)
+        self.flight = (
+            Flight(calendar, fps, seed=seed)
+            if jets == 1
+            else Squadron(calendar, jets, fps, seed=seed)
+        )
+        self.flights = (self.flight,) if jets == 1 else self.flight.flights
         self.frame_count = self.flight.frame_count
         self.maximum = max(day.commits for day in calendar.days)
         self.hit_by_date = {s.cell.day.date: s.hit for s in self.flight.strikes}
@@ -59,10 +77,10 @@ class Renderer:
                 image.alpha_composite(
                     explosion_sprite(age), (strike.target[0] - 12, strike.target[1] - 12)
                 )
-        pose = self.flight.pose(frame)
-        angle = sprite_heading(pose.heading)
-        thrust = 1 + (frame // 2) % 2 if pose.thrust else 0
-        image.alpha_composite(
-            self.jets[angle, thrust, pose.bank], (round(pose.x) - 18, round(pose.y) - 18)
-        )
+        for pose in self.flight.visible_poses(frame):
+            angle = sprite_heading(pose.heading)
+            thrust = 1 + (frame // 2) % 2 if pose.thrust else 0
+            image.alpha_composite(
+                self.jets[angle, thrust, pose.bank], (round(pose.x) - 18, round(pose.y) - 18)
+            )
         return image

@@ -27,6 +27,8 @@ def run():
             os.environ.get("JET_SCALE", "2"),
             "--fps",
             os.environ.get("JET_FPS", "20"),
+            "--jets",
+            os.environ.get("JET_JETS", "1"),
         ]
         if demo == "true":
             args += ["--demo", "--days", os.environ.get("JET_DAYS", "365")]

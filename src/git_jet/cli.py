@@ -31,6 +31,9 @@ def main(argv=None):
     render.add_argument("--end-date", type=date.fromisoformat)
     render.add_argument("--scale", type=int, default=2)
     render.add_argument("--fps", type=int, default=20)
+    render.add_argument(
+        "--jets", type=int, choices=(1, 2, 3), default=1, help="simultaneous jets (default: 1)"
+    )
     render.add_argument("--seed", help="reproduce a route; omit for fresh randomness on each run")
     render.add_argument("--output-dir", type=Path, default=Path("out"))
     args = parser.parse_args(argv)
@@ -58,7 +61,7 @@ def main(argv=None):
             if args.end_date is not None and calendar.days[-1].date != args.end_date:
                 raise ValueError("calendar observation date differs; collect fresh data")
             report = export(
-                Renderer(calendar, fps=options.fps, seed=args.seed),
+                Renderer(calendar, fps=options.fps, seed=args.seed, jets=args.jets),
                 args.output_dir,
                 options,
                 source=source_name,
