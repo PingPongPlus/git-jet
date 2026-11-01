@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-jet"
+version = "0.1.0"
+description = "A pixel jet launches from a carrier and clears your README commit history."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["Pillow>=13,<14"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "build>=1,<2", "setuptools>=77"]
+
+[project.scripts]
+git-jet = "git_jet.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["artwork/drafts/output", "out"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

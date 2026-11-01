@@ -1,0 +1,73 @@
+name: Git Jet
+description: Launch a pixel jet from a carrier to clear your real commit calendar in a transparent GIF
+author: Git Jet contributors
+branding:
+  icon: send
+  color: blue
+inputs:
+  username:
+    description: GitHub user; defaults to the calling repository owner
+    default: ''
+  days:
+    description: Complete UTC days including today, 1 to 365
+    default: '365'
+  output-dir:
+    description: Generated asset directory inside the caller workspace
+    default: git-jet-output
+  token:
+    description: Built-in token for public repository metadata
+    default: ${{ github.token }}
+  scale:
+    description: Integer pixel scale, 1 to 4
+    default: '2'
+  fps:
+    description: Animation frame rate, 5, 10, 20 or 25
+    default: '20'
+  demo:
+    description: Use the synthetic offline demo instead of live data (for verification)
+    default: 'false'
+  seed:
+    description: Optional reproducible route seed; empty generates a fresh route each run
+    default: ''
+outputs:
+  calendar:
+    description: Absolute path to credential-free calendar JSON
+    value: ${{ steps.collect.outputs.calendar }}
+  gif:
+    description: Absolute path to the transparent animated GIF
+    value: ${{ steps.collect.outputs.gif }}
+  png:
+    description: Absolute path to the full-calendar static PNG
+    value: ${{ steps.collect.outputs.png }}
+  publish-script:
+    description: Optional isolated output-branch publisher; generation never publishes
+    value: ${{ steps.collect.outputs.publish-script }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.13'
+    - id: collect
+      shell: bash
+      env:
+        JET_ACTION_PATH: ${{ github.action_path }}
+        JET_ENV: ${{ runner.temp }}/git-jet-${{ github.action }}
+        JET_USERNAME: ${{ inputs.username }}
+        JET_DAYS: ${{ inputs.days }}
+        JET_SCALE: ${{ inputs.scale }}
+        JET_FPS: ${{ inputs.fps }}
+        JET_DEMO: ${{ inputs.demo }}
+        JET_SEED: ${{ inputs.seed }}
+        JET_OUTPUT_DIR: ${{ inputs.output-dir }}
+        JET_REPOSITORY_OWNER: ${{ github.repository_owner }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          echo '::error::Git Jet action requires Linux or macOS; use ubuntu-latest.'
+          exit 1
+        fi
+        python -m venv "$JET_ENV"
+        "$JET_ENV/bin/python" -m pip install --disable-pip-version-check "$JET_ACTION_PATH"
+        "$JET_ENV/bin/python" "$JET_ACTION_PATH/scripts/run_action.py"

@@ -1,0 +1,7 @@
+include LICENSE README.md CONTRIBUTING.md action.yml
+recursive-include scripts *.py
+recursive-include artwork *.py *.md *.png *.gif
+recursive-include tests *.py
+recursive-include .github *.yml
+recursive-include examples *.yml *.png *.gif *.json
+recursive-include docs *.md

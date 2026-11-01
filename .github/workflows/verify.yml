@@ -1,0 +1,54 @@
+name: Verify
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        python: ['3.11', '3.15']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install '.[dev]'
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest -q
+      - run: python -m build --no-isolation
+  action-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./
+        id: jet
+        with:
+          demo: 'true'
+          scale: '1'
+          seed: action-smoke
+          output-dir: action-smoke
+          token: ''
+      - name: Verify generated paths
+        env:
+          JET_GIF: ${{ steps.jet.outputs.gif }}
+          JET_PNG: ${{ steps.jet.outputs.png }}
+          JET_CALENDAR: ${{ steps.jet.outputs.calendar }}
+        run: |
+          test -s "$JET_GIF"
+          test -s "$JET_PNG"
+          test -s "$JET_CALENDAR"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: git-jet-demo
+          path: action-smoke/
