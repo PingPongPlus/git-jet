@@ -37,8 +37,6 @@ REFERENCE_OUTLINE = (
     (151, 874),
 )
 REFERENCE_RUNWAY = ((760, 734), (1655, 458), (1808, 457), (1018, 728))
-FLIGHT_DECK = (224, 28, 30)
-FLIGHT_BOW = (-15, 21, 30)
 RADAR_ORIGIN = (178, 3, 60)
 
 
@@ -47,6 +45,21 @@ def reference_point(x, y, z=29):
     fore = ((45 / 136) * dx - dy) / (142 / 562 + 45 / 136)
     across = dx - fore
     return -27 + fore * 0.18, -4 + across * 0.22, z
+
+
+def flight_anchors():
+    """Use the painted angled runway, with room for the whole ground sprite."""
+    lane = [reference_point(*p, 30) for p in REFERENCE_RUNWAY]
+    front = tuple((a + b) / 2 for a, b in zip(lane[0], lane[3], strict=True))
+    rear = tuple((a + b) / 2 for a, b in zip(lane[1], lane[2], strict=True))
+    length = math.dist(project(*front), project(*rear))
+
+    def along(distance):
+        return tuple(a + (b - a) * distance / length for a, b in zip(rear, front, strict=True))
+
+    # Touch down 18 native pixels inside the rear threshold, then decelerate
+    # through the 55-pixel landing roll to the same point used for the next launch.
+    return along(18 + 55), along(length - 18)
 
 
 def carrier_sprite(t=0):

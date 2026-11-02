@@ -5,9 +5,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from git_jet.art import jet_sprite, project
+from git_jet.art import project
 from git_jet.demo import demo_calendar
-from git_jet.flight import heading, sprite_heading
 from git_jet.render import Renderer
 
 ROOT = Path(__file__).resolve().parent
@@ -38,14 +37,7 @@ def main():
         ImageDraw.Draw(sheet).text((index * 720 + 24, 12), label, fill="#c9d1d9", font=font)
     sheet.save(output / "lincoln-redline-approval.png")
     renderer = Renderer(demo_calendar(), seed="git-jet-loop")
-    scene = Image.new("RGBA", (480, 320))
-    scene.alpha_composite(original, (65, 12))
-    scene.alpha_composite(renderer.grid_frame(0))
-    deck, bow = project(*draft.FLIGHT_DECK), project(*draft.FLIGHT_BOW)
-    direction = heading((bow[0] - deck[0], bow[1] - deck[1]))
-    scene.alpha_composite(
-        jet_sprite(sprite_heading(direction)), (65 + deck[0] - 18, 12 + deck[1] - 18)
-    )
+    scene = renderer.frame(0)
     scene.resize((1440, 960), Image.Resampling.NEAREST).save(output / "lincoln-redline-scene.png")
     frames = []
     for index in range(80):

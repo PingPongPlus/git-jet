@@ -30,9 +30,9 @@ def carrier_launch_points(carrier=DEFAULT_CARRIER):
     validate_carrier(carrier)
     if carrier == "classic":
         return (224, 33, 28), (-8, 32, 28)
-    from .lincoln import FLIGHT_BOW, FLIGHT_DECK
+    from .lincoln import flight_anchors
 
-    return FLIGHT_DECK, FLIGHT_BOW
+    return flight_anchors()
 
 
 def carrier_radar_origin(carrier=DEFAULT_CARRIER):

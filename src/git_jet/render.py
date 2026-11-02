@@ -68,6 +68,15 @@ class Renderer:
             )
         return image
 
+    def jet_image(self, pose, frame):
+        angle = sprite_heading(pose.heading)
+        thrust = 1 + (frame // 2) % 2 if pose.thrust else 0
+        image = self.jets[angle, thrust, pose.bank]
+        if pose.scale != 1:
+            size = 2 * round(18 * pose.scale) + 1
+            image = image.resize((size, size), Image.Resampling.NEAREST)
+        return image
+
     def frame(self, frame_number: int):
         frame = frame_number % self.frame_count
         phase = frame / (self.flight.fps * 4)
@@ -88,9 +97,7 @@ class Renderer:
                     explosion_sprite(age), (strike.target[0] - 12, strike.target[1] - 12)
                 )
         for pose in self.flight.visible_poses(frame):
-            angle = sprite_heading(pose.heading)
-            thrust = 1 + (frame // 2) % 2 if pose.thrust else 0
-            image.alpha_composite(
-                self.jets[angle, thrust, pose.bank], (round(pose.x) - 18, round(pose.y) - 18)
-            )
+            sprite = self.jet_image(pose, frame)
+            half = sprite.width // 2
+            image.alpha_composite(sprite, (round(pose.x) - half, round(pose.y) - half))
         return image

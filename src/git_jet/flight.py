@@ -7,7 +7,7 @@ import hashlib
 import math
 import random
 import secrets
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from .art import DEFAULT_CARRIER, carrier_launch_points, project
 from .calendar import Calendar, Cell
@@ -49,6 +49,7 @@ class Pose:
     heading: float
     thrust: int = 1
     bank: int = 0
+    scale: float = 1.0
 
 
 class ArcPath:
@@ -145,6 +146,10 @@ def course(entry_x, rng, top, height):
     maneuvers = []
     spin_side = rng.choice(("upper", "lower")) if rng.random() < 0.6 else None
     spin_x = rng.uniform(200, 325)
+    if spin_side == "upper":
+        # The angled runway can join farther right. Never put a loop behind
+        # that entry point and make the first sweep reverse direction.
+        spin_x = max(spin_x, entry_x + 20)
     radius = rng.uniform(34, 38)
     upper_amp = rng.uniform(-5, 5)
     lower_amp = rng.uniform(-5, 5)
@@ -250,6 +255,7 @@ class Flight:
         self.fps = fps
         deck_point, bow_point = carrier_launch_points(carrier)
         self.carrier = carrier
+        self.deck_scale = 0.45 if carrier == "lincoln" else 1.0
         self.seed = route_seed(seed)
         self.jet_id = jet_id
         rng = random.Random(self.seed)
@@ -394,7 +400,7 @@ class Flight:
 
     def pose(self, frame):
         if frame < self.launch_start or frame >= self.landed:
-            return Pose(*self.deck, self.takeoff_heading, 0, 0)
+            return Pose(*self.deck, self.takeoff_heading, 0, 0, self.deck_scale)
         if frame < self.launch_end:
             u = (frame - self.launch_start) / self.launch_frames
             t = 2 * u**3 - u**4
@@ -403,17 +409,20 @@ class Flight:
                 self.deck[1] + (self.bow[1] - self.deck[1]) * t,
                 self.takeoff_heading,
                 2,
+                scale=self.deck_scale,
             )
         if frame < self.cruise_start:
-            return self.departure.pose(
+            pose = self.departure.pose(
                 (frame - self.launch_end) / self.departure_frames * self.departure.length
             )
+            return replace(pose, scale=self._airborne_scale(frame - self.launch_end))
         if frame < self.cruise_end:
             return self.course.pose((frame - self.cruise_start) * self.step)
         cursor = self.cruise_end
         for path, frames in zip(self.returns, self.return_frames, strict=True):
             if frame < cursor + frames:
-                return path.pose((frame - cursor) / frames * path.length)
+                pose = path.pose((frame - cursor) / frames * path.length)
+                return replace(pose, scale=self._airborne_scale(self.touchdown - frame))
             cursor += frames
         u = (frame - self.touchdown) / self.landing_frames
         t = 2 * u - 2 * u**3 + u**4
@@ -422,7 +431,14 @@ class Flight:
             self.approach[1] + (self.deck[1] - self.approach[1]) * t,
             self.takeoff_heading,
             0,
+            scale=self.deck_scale,
         )
+
+    def _airborne_scale(self, frames_from_deck):
+        # Ground aircraft match the parked jets. Grow after clearing the deck
+        # and shrink on final approach, without changing position or airspeed.
+        u = min(1.0, frames_from_deck / (0.45 * self.fps))
+        return self.deck_scale + (1 - self.deck_scale) * (3 * u * u - 2 * u**3)
 
     def restored(self, cell, frame):
         return frame >= self.reset_start + (cell.column / 53) * self.reset_frames
