@@ -48,7 +48,7 @@ def reference_point(x, y, z=29):
 
 
 def flight_anchors():
-    """Use the painted angled runway, with room for the whole ground sprite."""
+    """Follow the painted runway with clearance past the jet's nose and tail."""
     lane = [reference_point(*p, 30) for p in REFERENCE_RUNWAY]
     front = tuple((a + b) / 2 for a, b in zip(lane[0], lane[3], strict=True))
     rear = tuple((a + b) / 2 for a, b in zip(lane[1], lane[2], strict=True))
@@ -57,9 +57,9 @@ def flight_anchors():
     def along(distance):
         return tuple(a + (b - a) * distance / length for a, b in zip(rear, front, strict=True))
 
-    # Touch down 18 native pixels inside the rear threshold, then decelerate
+    # Touch down 26 native pixels inside the rear threshold, then decelerate
     # through the 55-pixel landing roll to the same point used for the next launch.
-    return along(18 + 55), along(length - 18)
+    return along(26 + 55), along(length - 18)
 
 
 def carrier_sprite(t=0):

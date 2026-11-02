@@ -12,10 +12,12 @@
   original reference outside the rotating radar and the requested aerial cleanup.
 - Both models retain the original projection and transparent 350×190 native
   carrier canvas. Lincoln's launch and landing anchors now come from the painted
-  angled runway. Its ground jet fits the runway, smoothly grows after liftoff
-  and shrinks before touchdown. Tests check every visible sprite pixel stays
-  inside the runway throughout both ground rolls with 1–3 jets at every supported
-  FPS. The landing roll stops at the next launch point without overshooting.
+  angled runway. The jet retains its original 37×37 sprite canvas throughout
+  takeoff, flight and landing, without size transitions. Touchdown is inset
+  farther onto the deck for clearance. Tests check its centre follows the painted
+  runway and every visible sprite pixel stays on the flight deck during both
+  ground rolls, with 1–3 jets at every supported FPS. The landing roll stops at
+  the next launch point without overshooting.
   Tests also cover smooth, bounded flight with all 365 targets and randomized
   routes; upper loops remain ahead of the new departure entry.
 - Both mast antennas rotate once every four seconds, including while jets are
@@ -23,7 +25,7 @@
   transparency and no disconnected pixels above the radars in all 80 phases.
 - Both README demos use the same fixed 56-commit, 14-active-day synthetic calendar,
   seed `git-jet-loop`, 960×640 size and 20 FPS. Lincoln exports 24 seconds and
-  7,345,520 bytes; Classic remains 28 seconds and 8,407,801 bytes. Every decoded GIF frame matches
+  7,371,234 bytes; Classic remains 28 seconds and 8,407,801 bytes. Every decoded GIF frame matches
   its intended pixels, transparency, timing and cleanup. Each demo has 14 attacks.
 - Auto size reduction retains all day-cell targets and the route seed, lowers
   scale before FPS, and preserves the selected carrier. Tests also cover opt-out,

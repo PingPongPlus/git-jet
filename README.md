@@ -7,8 +7,8 @@ pixel explosions and a spinning radar. Runs with GitHub Actions.
 **Lincoln — default carrier**
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=runway-20261102">
-  <img src="examples/demo/git-jet.gif?v=runway-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier with an angled runway, detailed island and spinning radar.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=runway-size-20261102">
+  <img src="examples/demo/git-jet.gif?v=runway-size-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier with an angled runway, detailed island and spinning radar.">
 </picture>
 
 **Classic — original carrier**

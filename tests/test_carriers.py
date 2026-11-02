@@ -52,8 +52,8 @@ def test_each_carrier_aligns_launch_and_landing_with_its_deck(carrier):
 
 @pytest.mark.parametrize("fps", (5, 10, 20, 25))
 @pytest.mark.parametrize("jets", (1, 2, 3))
-def test_lincoln_ground_roll_and_whole_sprite_stay_inside_the_painted_runway(fps, jets):
-    from git_jet.lincoln import REFERENCE_RUNWAY, reference_point
+def test_lincoln_normal_size_jet_follows_the_runway_and_stays_on_deck(fps, jets):
+    from git_jet.lincoln import REFERENCE_OUTLINE, REFERENCE_RUNWAY, reference_point
 
     renderer = Renderer(demo_calendar(), fps=fps, jets=jets, seed="runway-footprint")
     runway = Image.new("1", (480, 320))
@@ -62,12 +62,20 @@ def test_lincoln_ground_roll_and_whole_sprite_stay_inside_the_painted_runway(fps
         for x, y in (art.project(*reference_point(*p, 30)) for p in REFERENCE_RUNWAY)
     ]
     ImageDraw.Draw(runway).polygon(corners, fill=1)
+    deck = Image.new("1", (480, 320))
+    ImageDraw.Draw(deck).polygon(
+        [
+            (65 + x, 12 + y)
+            for x, y in (art.project(*reference_point(*p, 30)) for p in REFERENCE_OUTLINE)
+        ],
+        fill=1,
+    )
     rear = tuple((a + b) / 2 for a, b in zip(corners[1], corners[2], strict=True))
     front = tuple((a + b) / 2 for a, b in zip(corners[0], corners[3], strict=True))
     runway_heading = math.degrees(math.atan2(front[0] - rear[0], rear[1] - front[1])) % 360
     for flight in renderer.flights:
         assert abs(flight.takeoff_heading - runway_heading) < 1
-        assert math.dist(flight.approach, rear) > 15
+        assert math.dist(flight.approach, rear) > 23
         assert math.dist(flight.bow, front) > 15
         frames = (
             [0]
@@ -78,22 +86,24 @@ def test_lincoln_ground_roll_and_whole_sprite_stay_inside_the_painted_runway(fps
             pose = flight.pose(frame)
             assert pose.heading == pytest.approx(flight.takeoff_heading, abs=0.01)
             assert pose.bank == 0
+            assert runway.getpixel((round(pose.x), round(pose.y)))
             sprite = renderer.jet_image(pose, frame)
             half = sprite.width // 2
-            assert sprite.width == 17
+            thrust = 1 + (frame // 2) % 2 if pose.thrust else 0
+            assert sprite.size == (37, 37)
+            assert (
+                sprite.tobytes()
+                == art.jet_sprite(sprite_heading(pose.heading), thrust, pose.bank).tobytes()
+            )
             for y in range(sprite.height):
                 for x in range(sprite.width):
                     if sprite.getpixel((x, y))[3]:
-                        assert runway.getpixel(
+                        assert deck.getpixel(
                             (round(pose.x) - half + x, round(pose.y) - half + y)
                         ), (frame, x, y)
         assert flight.pose(flight.landed) == flight.pose(0)
-        assert flight.pose(flight.cruise_start).scale == 1
-        assert flight.pose(flight.touchdown - math.ceil(0.5 * fps)).scale == 1
-        assert all(
-            abs(flight.pose(n).scale - flight.pose(n - 1).scale) <= 2 / fps
-            for n in range(flight.launch_end + 1, flight.touchdown + 1)
-        )
+        for frame in range(flight.launch_end, flight.touchdown):
+            assert renderer.jet_image(flight.pose(frame), frame).size == (37, 37)
 
 
 @pytest.mark.parametrize("carrier", ("lincoln", "classic"))

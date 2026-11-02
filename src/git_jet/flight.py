@@ -7,7 +7,7 @@ import hashlib
 import math
 import random
 import secrets
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 
 from .art import DEFAULT_CARRIER, carrier_launch_points, project
 from .calendar import Calendar, Cell
@@ -49,7 +49,6 @@ class Pose:
     heading: float
     thrust: int = 1
     bank: int = 0
-    scale: float = 1.0
 
 
 class ArcPath:
@@ -255,7 +254,6 @@ class Flight:
         self.fps = fps
         deck_point, bow_point = carrier_launch_points(carrier)
         self.carrier = carrier
-        self.deck_scale = 0.45 if carrier == "lincoln" else 1.0
         self.seed = route_seed(seed)
         self.jet_id = jet_id
         rng = random.Random(self.seed)
@@ -400,7 +398,7 @@ class Flight:
 
     def pose(self, frame):
         if frame < self.launch_start or frame >= self.landed:
-            return Pose(*self.deck, self.takeoff_heading, 0, 0, self.deck_scale)
+            return Pose(*self.deck, self.takeoff_heading, 0, 0)
         if frame < self.launch_end:
             u = (frame - self.launch_start) / self.launch_frames
             t = 2 * u**3 - u**4
@@ -409,20 +407,17 @@ class Flight:
                 self.deck[1] + (self.bow[1] - self.deck[1]) * t,
                 self.takeoff_heading,
                 2,
-                scale=self.deck_scale,
             )
         if frame < self.cruise_start:
-            pose = self.departure.pose(
+            return self.departure.pose(
                 (frame - self.launch_end) / self.departure_frames * self.departure.length
             )
-            return replace(pose, scale=self._airborne_scale(frame - self.launch_end))
         if frame < self.cruise_end:
             return self.course.pose((frame - self.cruise_start) * self.step)
         cursor = self.cruise_end
         for path, frames in zip(self.returns, self.return_frames, strict=True):
             if frame < cursor + frames:
-                pose = path.pose((frame - cursor) / frames * path.length)
-                return replace(pose, scale=self._airborne_scale(self.touchdown - frame))
+                return path.pose((frame - cursor) / frames * path.length)
             cursor += frames
         u = (frame - self.touchdown) / self.landing_frames
         t = 2 * u - 2 * u**3 + u**4
@@ -431,14 +426,7 @@ class Flight:
             self.approach[1] + (self.deck[1] - self.approach[1]) * t,
             self.takeoff_heading,
             0,
-            scale=self.deck_scale,
         )
-
-    def _airborne_scale(self, frames_from_deck):
-        # Ground aircraft match the parked jets. Grow after clearing the deck
-        # and shrink on final approach, without changing position or airspeed.
-        u = min(1.0, frames_from_deck / (0.45 * self.fps))
-        return self.deck_scale + (1 - self.deck_scale) * (3 * u * u - 2 * u**3)
 
     def restored(self, cell, frame):
         return frame >= self.reset_start + (cell.column / 53) * self.reset_frames

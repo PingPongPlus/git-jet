@@ -71,11 +71,7 @@ class Renderer:
     def jet_image(self, pose, frame):
         angle = sprite_heading(pose.heading)
         thrust = 1 + (frame // 2) % 2 if pose.thrust else 0
-        image = self.jets[angle, thrust, pose.bank]
-        if pose.scale != 1:
-            size = 2 * round(18 * pose.scale) + 1
-            image = image.resize((size, size), Image.Resampling.NEAREST)
-        return image
+        return self.jets[angle, thrust, pose.bank]
 
     def frame(self, frame_number: int):
         frame = frame_number % self.frame_count
