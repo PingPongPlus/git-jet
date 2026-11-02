@@ -23,7 +23,9 @@ def test_live_render_automatically_fits_without_recollecting_or_skipping_targets
         return calendar
 
     monkeypatch.setattr("git_jet.cli.GitHubClient.collect", collect)
-    monkeypatch.setattr(exporter, "MAX_BYTES", 5_000_000)
+    # Between the native and doubled-size demos, so this exercises scale-only
+    # fallback even with the richer animated ocean surface.
+    monkeypatch.setattr(exporter, "MAX_BYTES", 8_000_000)
     assert (
         main(
             [
@@ -95,6 +97,7 @@ def test_scale_is_reduced_before_fps_with_one_fresh_seed_and_all_targets(monkeyp
         assert renderer.calendar is calendar
         assert renderer.flight.seed == "keep-this-route" and renderer.jet_count == 3
         assert renderer.carrier == "classic"
+        assert renderer.water == "original"
         assert len(renderer.flight.strikes) == 14
         assert sum(s.cell.day.commits for s in renderer.flight.strikes) == calendar.total
         if options.fps == 20:
@@ -103,7 +106,9 @@ def test_scale_is_reduced_before_fps_with_one_fresh_seed_and_all_targets(monkeyp
 
     monkeypatch.setattr("git_jet.flight.secrets.token_hex", fresh_seed)
     monkeypatch.setattr(exporter, "export", fit)
-    assert render_assets(calendar, tmp_path, Options(), jets=3, carrier="classic") == {"fps": 10}
+    assert render_assets(
+        calendar, tmp_path, Options(), jets=3, carrier="classic", water="original"
+    ) == {"fps": 10}
     assert attempts == [Options(2, 20), Options(1, 20), Options(1, 10)]
     assert len(seeds) == 1
 

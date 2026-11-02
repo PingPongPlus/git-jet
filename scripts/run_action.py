@@ -34,6 +34,8 @@ def run():
             os.environ.get("JET_JETS", "1"),
             "--carrier",
             os.environ.get("JET_CARRIER", "lincoln"),
+            "--water",
+            os.environ.get("JET_WATER", "ocean"),
         ]
         if demo == "true":
             args += ["--demo", "--days", os.environ.get("JET_DAYS", "365")]

@@ -11,6 +11,7 @@
   "attack_mode": "day-cell",
   "jets": 1,
   "carrier": "classic",
+  "water": "ocean",
   "seed": "git-jet-loop",
   "flights": [
     {
@@ -40,7 +41,7 @@
   "duration_seconds": 28.0,
   "transparent": true,
   "decoded_frames_match": true,
-  "gif_bytes": 8407801,
+  "gif_bytes": 14332647,
   "targets": [
     {
       "date": "2026-10-18",

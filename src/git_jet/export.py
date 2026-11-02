@@ -10,13 +10,15 @@ from array import array
 from dataclasses import dataclass
 from pathlib import Path
 
-from PIL import GifImagePlugin, Image, ImageChops
+from PIL import GifImagePlugin, Image, ImageChops, ImageColor
 
 from . import art
 from .calendar import Calendar
 from .flight import HEIGHT, WIDTH, route_seed
 from .limits import FrameLimitError, GifSizeLimitError
 from .render import Renderer
+from .water import COLORS as WATER_COLORS
+from .water import DEFAULT_WATER
 
 ASSETS = ("git-jet.gif", "git-jet.png", "report.json", "calendar.json")
 MAX_BYTES = 25_000_000
@@ -41,7 +43,12 @@ def palette():
         *(art.explosion_sprite(i / 10) for i in range(10)),
         *(art.jet_sprite(0, thrust, bank) for thrust in range(3) for bank in (-1, 0, 1)),
     ]
-    colors = sorted({color for sample in samples for _, color in sample.getcolors(256) if color[3]})
+    colors = sorted(
+        {
+            *(color for sample in samples for _, color in sample.getcolors(256) if color[3]),
+            *(ImageColor.getcolor(color, "RGBA") for color in WATER_COLORS),
+        }
+    )
     if len(colors) > 255 or any(color[3] != 255 for color in colors):
         raise ValueError("artwork must fit 255 opaque colors plus transparency")
     entries = [(0, 0, 0, 0), *colors]
@@ -131,6 +138,7 @@ def export(
             "attack_mode": "day-cell",
             "jets": renderer.jet_count,
             "carrier": renderer.carrier,
+            "water": renderer.water,
             "seed": renderer.flight.seed,
             "flights": [
                 {
@@ -181,6 +189,7 @@ def render_assets(
     *,
     jets=1,
     carrier=art.DEFAULT_CARRIER,
+    water=DEFAULT_WATER,
     seed=None,
     source="live",
     auto_compress=True,
@@ -193,7 +202,9 @@ def render_assets(
     attempt = 0
     for fps in rates:
         try:
-            renderer = Renderer(calendar, fps=fps, seed=seed, jets=jets, carrier=carrier)
+            renderer = Renderer(
+                calendar, fps=fps, seed=seed, jets=jets, carrier=carrier, water=water
+            )
             scales = (
                 range(options.scale, 0, -1)
                 if auto_compress and fps == options.fps

@@ -26,14 +26,25 @@ from .flight import (
     Squadron,
     sprite_heading,
 )
+from .water import DEFAULT_WATER, validate_water, water_sprite
+from .water import POSITION as WATER_POSITION
 
 
 class Renderer:
-    def __init__(self, calendar: Calendar, fps=20, seed=None, jets=1, carrier=DEFAULT_CARRIER):
+    def __init__(
+        self,
+        calendar: Calendar,
+        fps=20,
+        seed=None,
+        jets=1,
+        carrier=DEFAULT_CARRIER,
+        water=DEFAULT_WATER,
+    ):
         if type(jets) is not int or not 1 <= jets <= 3:
             raise ValueError("jets must be an integer in 1..3")
         self.jet_count = jets
         self.carrier = validate_carrier(carrier)
+        self.water = validate_water(water)
         self.calendar = calendar
         self.cells = calendar.cells()
         self.flight = (
@@ -77,6 +88,9 @@ class Renderer:
         frame = frame_number % self.frame_count
         phase = frame / (self.flight.fps * 4)
         image = Image.new("RGBA", (WIDTH, HEIGHT))
+        image.alpha_composite(
+            water_sprite(phase, water=self.water, carrier=self.carrier), WATER_POSITION
+        )
         image.alpha_composite(carrier_sprite(phase, carrier=self.carrier), (65, 12))
         image.alpha_composite(self.grid_frame(frame))
         draw = ImageDraw.Draw(image)

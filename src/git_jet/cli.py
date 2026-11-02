@@ -12,6 +12,7 @@ from .calendar import Calendar
 from .demo import demo_calendar
 from .export import Options, render_assets
 from .github import GitHubClient, GitHubError
+from .water import DEFAULT_WATER, WATER_STYLES
 
 
 def main(argv=None):
@@ -36,6 +37,12 @@ def main(argv=None):
         choices=CARRIERS,
         default=DEFAULT_CARRIER,
         help="carrier artwork (default: lincoln)",
+    )
+    render.add_argument(
+        "--water",
+        choices=WATER_STYLES,
+        default=DEFAULT_WATER,
+        help="water artwork: ocean or original (default: ocean)",
     )
     render.add_argument(
         "--jets", type=int, choices=(1, 2, 3), default=1, help="simultaneous jets (default: 1)"
@@ -78,6 +85,7 @@ def main(argv=None):
                 options,
                 jets=args.jets,
                 carrier=args.carrier,
+                water=args.water,
                 seed=args.seed,
                 source=source_name,
                 auto_compress=args.auto_compress,
