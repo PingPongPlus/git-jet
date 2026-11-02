@@ -4,7 +4,7 @@ import math
 
 from PIL import Image, ImageDraw
 
-from git_jet.art import DEEP, FOAM, GOLD, INK, LIGHT, WAVE, project, radar_sprite
+from git_jet.art import FOAM, GOLD, INK, LIGHT, project, radar_sprite
 
 HULL = "#546570"
 LIT = "#71838d"
@@ -93,41 +93,6 @@ def carrier_sprite(t=0):
             ],
             top,
         )
-
-    phase = math.tau * (t % 1)
-    for index, (u, v) in enumerate(
-        ((-3, 27), (35, 34), (75, 40), (116, 57), (158, 57), (200, 57), (242, 56), (268, 47))
-    ):
-        x, y = project(u, v, 0)
-        x += round(2 * math.sin(phase + index))
-        y += round(math.sin(phase + index * 0.8))
-        reach = (15, 21, 20, 25, 22, 24, 18, 14)[index]
-        draw.polygon(
-            [
-                (x - 8, y + 2),
-                (x + reach - 4, y - 7),
-                (x + reach + 4, y - 6),
-                (x + 2, y + 5),
-                (x - 10, y + 5),
-            ],
-            fill=DEEP,
-        )
-        draw.line((x - 5, y + 1, x + reach - 4, y - 6), fill=WAVE, width=2)
-        draw.line((x - 1, y, x + reach - 9, y - 4), fill=FOAM)
-    x, y = project(-12, 10, 2)
-    draw.polygon(
-        [
-            (x - 10, y + 1),
-            (x - 4, y - 4),
-            (x + 2, y - 2),
-            (x + 9, y),
-            (x + 15, y + 3),
-            (x + 3, y + 6),
-            (x - 7, y + 5),
-        ],
-        fill=WAVE,
-    )
-    draw.line((x - 7, y, x - 2, y - 2, x + 4, y + 1, x + 10, y + 2), fill=FOAM, width=2)
 
     # A fine raked stem underneath the thin, straight bow deck edge.
     stem, keel = (-23, 11, 24), (-10, 11, 8)

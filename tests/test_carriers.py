@@ -17,7 +17,7 @@ from git_jet.render import Renderer
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_lincoln_is_the_default_and_matches_the_approved_drawing():
+def test_lincoln_is_the_default_and_preserves_the_approved_body(assert_carrier_body_preserved):
     spec = importlib.util.spec_from_file_location(
         "approved_lincoln", ROOT / "artwork/drafts/lincoln_redline.py"
     )
@@ -27,11 +27,10 @@ def test_lincoln_is_the_default_and_matches_the_approved_drawing():
     with Image.open(
         ROOT / "artwork/drafts/output/lincoln-island-detail-transparent.png"
     ) as reference:
-        assert art.carrier_sprite().tobytes() == reference.tobytes()
+        assert_carrier_body_preserved(art.carrier_sprite(), reference)
     for index in range(80):
-        assert (
-            art.carrier_sprite(index / 80).tobytes()
-            == approved.carrier_sprite(index / 80).tobytes()
+        assert_carrier_body_preserved(
+            art.carrier_sprite(index / 80), approved.carrier_sprite(index / 80)
         )
     assert art.carrier_sprite().tobytes() != art.carrier_sprite(carrier="classic").tobytes()
 

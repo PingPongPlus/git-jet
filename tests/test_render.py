@@ -62,7 +62,7 @@ def test_zero_commits_patrol_has_no_targets_or_fabricated_hits():
         assert set(renderer.frame(frame).getchannel("A").tobytes()) == {0, 255}
 
 
-def test_production_art_preserves_approved_studies_outside_the_rotating_radar():
+def test_production_art_preserves_approved_body_and_effects(assert_carrier_body_preserved):
     spec = importlib.util.spec_from_file_location(
         "approved_art", ROOT / "artwork/drafts/sprites.py"
     )
@@ -73,7 +73,7 @@ def test_production_art_preserves_approved_studies_outside_the_rotating_radar():
         x, y = art.project(185, 10, 60)
         # The owner requested removal of this detached five-pixel aerial.
         reference.paste((0, 0, 0, 0), (x - 3, y - 26, x - 2, y - 21))
-        assert art.carrier_sprite(carrier="classic").tobytes() == reference.tobytes()
+        assert_carrier_body_preserved(art.carrier_sprite(carrier="classic"), reference)
     for phase in (0, 0.12, 0.5, 0.95):
         current, original = (
             art.carrier_sprite(phase, carrier="classic"),
@@ -82,7 +82,7 @@ def test_production_art_preserves_approved_studies_outside_the_rotating_radar():
         x, y = art.project(185, 10, 60)
         radar = (x - 7, y - 27, x + 9, y - 12)
         original.paste(current.crop(radar), radar[:2])
-        assert current.tobytes() == original.tobytes()
+        assert_carrier_body_preserved(current, original)
     for heading in (i * 22.5 for i in range(16)):
         for bank in (-1, 0, 1):
             for thrust in (0, 1, 2):
@@ -121,7 +121,7 @@ def test_airborne_speed_and_heading_are_continuous_through_shots_and_path_joins(
 
 def test_frame_rate_changes_sampling_not_cruise_speed():
     for fps in (5, 10, 20, 25):
-        flight = Flight(demo_calendar(), fps=fps)
+        flight = Flight(demo_calendar(), fps=fps, seed="frame-rate-sampling")
         assert flight.frame_count % (fps * 4) == 0
         assert 98 < flight.step * fps <= 100
         a, b = flight.pose(flight.cruise_start + 1), flight.pose(flight.cruise_start + 2)

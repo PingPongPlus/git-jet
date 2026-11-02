@@ -153,26 +153,6 @@ def classic_carrier_sprite(t=0):
             CREAM,
         )
 
-    # Detached stepped foam patches, rather than an opaque ocean rectangle.
-    angle = math.tau * (t % 1)
-    for index, u in enumerate((-7, 30, 70, 112, 158, 202, 241)):
-        x, y = project(u, 58, -2)
-        x += round(2 * math.sin(angle + index))
-        y += round(math.sin(angle + index * 0.7))
-        width = (22, 31, 24, 35, 23, 30, 21)[index]
-        draw.polygon(
-            [
-                (x - 7, y),
-                (x + width - 5, y - 10),
-                (x + width, y - 9),
-                (x + 1, y + 3),
-                (x - 10, y + 3),
-            ],
-            fill=DEEP,
-        )
-        draw.line((x - 4, y, x + width - 7, y - 9), fill=WAVE, width=2)
-        draw.line((x, y - 1, x + width - 11, y - 8), fill=FOAM)
-
     # Deep sidewalls, red waterline, and angular bow face in the reference view.
     poly([(-18, 20, 24), (-18, 36, 24), (8, 52, 24), (8, 52, 0), (-18, 36, 0), (-18, 20, 7)], INK)
     poly(
