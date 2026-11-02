@@ -8,15 +8,15 @@ pixel explosions and a spinning radar. Runs with GitHub Actions.
 **Lincoln — default carrier**
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=water-bow-v3-20261102">
-  <img src="examples/demo/git-jet.gif?v=water-bow-v3-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier through rolling ocean water, with an angled runway, detailed island and spinning radar.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=water-bow-loop-20261102">
+  <img src="examples/demo/git-jet.gif?v=water-bow-loop-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier through rolling ocean water, with an angled runway, detailed island and spinning radar.">
 </picture>
 
 **Classic — original carrier**
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo-classic/git-jet.png?v=water-bow-v3-20261102">
-  <img src="examples/demo-classic/git-jet.gif?v=water-bow-v3-20261102" width="960" alt="The original ivory-island carrier with a spinning radar and flowing ocean wake launches a pixel jet to clear the commit calendar.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo-classic/git-jet.png?v=water-bow-loop-20261102">
+  <img src="examples/demo-classic/git-jet.gif?v=water-bow-loop-20261102" width="960" alt="The original ivory-island carrier with a spinning radar and flowing ocean wake launches a pixel jet to clear the commit calendar.">
 </picture>
 
 Choose `carrier: 'lincoln'` (default) or `carrier: 'classic'` in your workflow.

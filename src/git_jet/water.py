@@ -49,6 +49,53 @@ def validate_water(water):
     return water
 
 
+def _smoothstep(value):
+    value = min(1, max(0, value))
+    return value * value * (3 - 2 * value)
+
+
+def _fade(layer, opacity):
+    """Dissolve a layer without adding partial alpha or new GIF colors."""
+    if opacity >= 1:
+        return layer
+    thresholds = ((0, 8, 2, 10), (12, 4, 14, 6), (3, 11, 1, 9), (15, 7, 13, 5))
+    bounds = layer.getbbox()
+    if bounds:
+        pixels = layer.load()
+        for y in range(bounds[1], bounds[3]):
+            for x in range(bounds[0], bounds[2]):
+                if opacity <= (thresholds[y % 4][x % 4] + 0.5) / 16:
+                    pixels[x, y] = (0, 0, 0, 0)
+    return layer
+
+
+def _pressure_crest(age, carrier=DEFAULT_CARRIER):
+    layer = Image.new("RGBA", SIZE)
+    # Leave the end of the lifetime clear, including the last sample at every
+    # supported FPS. Wrapping the age can then never teleport a visible ridge.
+    if age <= 0 or age >= 0.88:
+        return layer
+    bow_u, bow_v, bow_z = (-12, 11, 6) if carrier == "lincoln" else (-19, 27, 5)
+    ridge = []
+    for step in range(25):
+        angle = -math.pi / 2 + math.pi * step / 24
+        u = bow_u + 4 + age * 12 - (3 + age * 14) * math.cos(angle)
+        v = bow_v + (5 + age * 28) * math.sin(angle)
+        z = bow_z * (1 - age) + 2 * math.sin(math.pi * age)
+        ridge.append(point(u, v, z))
+    draw = ImageDraw.Draw(layer)
+    draw.line(ridge, fill=SHALLOW, width=4, joint="curve")
+    draw.line(ridge, fill=SWELL, width=2, joint="curve")
+    highlights = Image.new("RGBA", SIZE)
+    bright = ImageDraw.Draw(highlights)
+    for start in (0, 4, 9, 14, 19, 22):
+        draw.line(ridge[start : start + 2], fill=GLINT)
+        bright.line(ridge[start : start + 2], fill=SPRAY)
+    layer.alpha_composite(_fade(highlights, 1 - _smoothstep((age - 0.25) / 0.15)))
+    opacity = _smoothstep(age / 0.10) * (1 - _smoothstep((age - 0.45) / 0.43))
+    return _fade(layer, opacity)
+
+
 def water_sprite(t=0, *, water=DEFAULT_WATER, carrier=DEFAULT_CARRIER):
     """Sample a four-second ocean cycle independently of export frame rate."""
     validate_water(water)
@@ -139,20 +186,7 @@ def _water_frame(index, carrier):
     # the sea. Their ends flare aft, carrying the displaced water around the bow.
     for crest in range(3):
         age = (time * 2 + crest / 3) % 1
-        radius = 3 + age * 14
-        spread = 5 + age * 28
-        ridge = []
-        for step in range(25):
-            angle = -math.pi / 2 + math.pi * step / 24
-            u = bow_u + 4 + age * 12 - radius * math.cos(angle)
-            v = bow_v + spread * math.sin(angle)
-            z = bow_z * (1 - age) + 2 * math.sin(math.pi * age)
-            ridge.append(point(u, v, z))
-        draw.line(ridge, fill=SHALLOW, width=4, joint="curve")
-        draw.line(ridge, fill=SWELL, width=2, joint="curve")
-        if age < 0.75:
-            for start in (0, 4, 9, 14, 19, 22):
-                draw.line(ridge[start : start + 2], fill=SPRAY if age < 0.35 else GLINT)
+        image.alpha_composite(_pressure_crest(age, carrier))
 
     # Bright foam follows curved paths away from the contact point. A second,
     # smaller set of particles rises above the crest and falls back into it.

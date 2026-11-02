@@ -14,6 +14,8 @@ The refined bow animation and the selectable `ocean` / `original` setting were
 approved by the owner on 2026-11-02. The bow foam starts at the submerged stem and
 peels aft along the hull. Pressure crests expand away from the stem, foam flows
 out to both sides, and short spray droplets rise and fall into the wake.
+Pressure crests dissolve into the sea before their animation age wraps, fixing
+the visible reset reported by the owner on 2026-11-02.
 The `original` setting reproduces the archived water pixels for both carriers.
 Run `python scripts/preview_water.py` to generate the ocean review loop, or add
 `--water original` to inspect the preserved effect.

@@ -31,7 +31,7 @@ def main():
         bow.putpalette(rgb)
         bow_frames.append(bow)
     frames[0].save(
-        output / f"{args.water}-{args.carrier}-motion-v3.gif",
+        output / f"{args.water}-{args.carrier}-motion-v4.gif",
         save_all=True,
         append_images=frames[1:],
         duration=50,
@@ -45,9 +45,9 @@ def main():
         background = Image.new("RGBA", (960, 440), color)
         background.alpha_composite(frames[0].convert("RGBA"))
         review.paste(background.convert("RGB"), (0, row * 440))
-    review.save(output / f"{args.water}-{args.carrier}-backgrounds-v3.png")
+    review.save(output / f"{args.water}-{args.carrier}-backgrounds-v4.png")
     bow_frames[0].save(
-        output / f"{args.water}-{args.carrier}-bow-v3.gif",
+        output / f"{args.water}-{args.carrier}-bow-v4.gif",
         save_all=True,
         append_images=bow_frames[1:],
         duration=50,

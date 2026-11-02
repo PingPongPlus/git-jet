@@ -121,7 +121,7 @@ def test_airborne_speed_and_heading_are_continuous_through_shots_and_path_joins(
 
 def test_frame_rate_changes_sampling_not_cruise_speed():
     for fps in (5, 10, 20, 25):
-        flight = Flight(demo_calendar(), fps=fps)
+        flight = Flight(demo_calendar(), fps=fps, seed="frame-rate-sampling")
         assert flight.frame_count % (fps * 4) == 0
         assert 98 < flight.step * fps <= 100
         a, b = flight.pose(flight.cruise_start + 1), flight.pose(flight.cruise_start + 2)

@@ -10,7 +10,7 @@ from git_jet.demo import demo_calendar
 from git_jet.export import indexed, palette
 from git_jet.flight import HEIGHT, WIDTH
 from git_jet.render import Renderer
-from git_jet.water import POSITION, water_sprite
+from git_jet.water import POSITION, _pressure_crest, water_sprite
 
 
 def test_water_moves_loops_and_keeps_clear_space_around_the_surface():
@@ -33,6 +33,28 @@ def test_every_water_frame_survives_the_shared_gif_palette_exactly():
         frame = Image.new("RGBA", (WIDTH, HEIGHT))
         frame.alpha_composite(water_sprite(index / 100), POSITION)
         assert indexed(frame, mapping, rgb, 1).convert("RGBA").tobytes() == frame.tobytes()
+
+
+@pytest.mark.parametrize("carrier", ("lincoln", "classic"))
+@pytest.mark.parametrize("fps", (5, 10, 20, 25))
+def test_pressure_crest_is_gone_before_its_age_wraps(carrier, fps):
+    # A crest lives for two seconds. Its last sampled frame must be clear,
+    # otherwise the next frame visibly jumps from the outer wave to the stem.
+    last_age = 1 - 1 / (fps * 2)
+    first, last = _pressure_crest(0, carrier), _pressure_crest(last_age, carrier)
+    assert first.getbbox() is None
+    assert last.tobytes() == first.tobytes()
+    assert _pressure_crest(0.4, carrier).getbbox() is not None
+
+
+@pytest.mark.parametrize("carrier", ("lincoln", "classic"))
+def test_pressure_crest_dissolves_gradually_before_the_reset(carrier):
+    visible = [
+        _pressure_crest(age, carrier).getchannel("A").histogram()[255]
+        for age in (0.4, 0.6, 0.8, 0.9)
+    ]
+    assert visible[0] > visible[1] > visible[2] > visible[3] == 0
+    assert set(_pressure_crest(0.8, carrier).getchannel("A").tobytes()) == {0, 255}
 
 
 @pytest.mark.parametrize(
