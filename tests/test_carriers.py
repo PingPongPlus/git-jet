@@ -39,10 +39,13 @@ def test_lincoln_is_the_default_and_preserves_the_approved_body(assert_carrier_b
 def test_each_carrier_aligns_launch_and_landing_with_its_deck(carrier):
     deck, bow = art.carrier_launch_points(carrier)
     renderer = Renderer(demo_calendar(), jets=3, seed="carrier-deck", carrier=carrier)
+    sx, sy = art.project(*deck)
+    assert sum(f.deck[0] for f in renderer.flights) / 3 == pytest.approx(65 + sx)
+    assert sum(f.deck[1] for f in renderer.flights) / 3 == pytest.approx(12 + sy)
     for flight in renderer.flights:
-        sx, sy = art.project(*deck)
         bx, by = art.project(*bow)
-        assert flight.deck == (65 + sx, 12 + sy)
+        dx, dy = flight.deck[0] - (65 + sx), flight.deck[1] - (12 + sy)
+        assert dx * flight.runway[1] - dy * flight.runway[0] == pytest.approx(0)
         assert flight.bow == (65 + bx, 12 + by)
         assert (flight.pose(0).x, flight.pose(0).y) == flight.deck
         assert (flight.pose(flight.landed).x, flight.pose(flight.landed).y) == flight.deck

@@ -17,6 +17,7 @@ WIDTH, HEIGHT = 480, 320
 GRID_X, GRID_Y, GRID_STEP = 28, 237, 8
 HEADING_STEPS = 64
 CRUISE_SPEED = 100.0  # Logical pixels per second, independent of export FPS.
+RUNWAY_SPACING = 32.0
 
 
 def unit(vector):
@@ -250,6 +251,7 @@ class Flight:
         delay=0,
         jet_id=0,
         carrier=DEFAULT_CARRIER,
+        deck_offset=0,
     ):
         self.fps = fps
         deck_point, bow_point = carrier_launch_points(carrier)
@@ -261,8 +263,10 @@ class Flight:
         height = rng.uniform(68, 76)
         sx, sy = project(*deck_point)
         bx, by = project(*bow_point)
-        self.deck, self.bow = (65 + sx, 12 + sy), (65 + bx, 12 + by)
+        base = (65 + sx, 12 + sy)
+        self.bow = (65 + bx, 12 + by)
         self.runway = unit((bx - sx, by - sy))
+        self.deck = tuple(p + v * deck_offset for p, v in zip(base, self.runway, strict=True))
         self.takeoff_heading = heading(self.runway)
         departure_turn = turn_points(self.runway, (1, 0))
         factor = (top - self.bow[1]) / departure_turn[-1][1]
@@ -297,18 +301,21 @@ class Flight:
             for lap in range(laps)
             for m in self.course.maneuvers
         ]
-        approach = tuple(p - v * 55 for p, v in zip(self.deck, self.runway, strict=True))
-        corner = turn_points((1, 0), (0, -1))
-        factor = -(top - 137) / corner[-1][1]
-        corner_x = 442 - (top - 137)
-        corner = [(corner_x + x * factor, top + y * factor) for x, y in corner]
-        first_return = ArcPath([entry, (corner_x, top), *corner[1:]])
+        approach = tuple(p - v * 55 for p, v in zip(base, self.runway, strict=True))
         landing_turn = turn_points((0, -1), self.runway)
         factor = (approach[0] - 442) / landing_turn[-1][0]
         turn_start = (442, approach[1] - landing_turn[-1][1] * factor)
         landing_turn = [
             (turn_start[0] + x * factor, turn_start[1] + y * factor) for x, y in landing_turn
         ]
+        # Keep travelling north between the two return turns when the Classic
+        # touchdown point moves onto the deck, rather than reversing direction.
+        corner_y = max(137, turn_start[1] + 5)
+        corner = turn_points((1, 0), (0, -1))
+        factor = -(top - corner_y) / corner[-1][1]
+        corner_x = 442 - (top - corner_y)
+        corner = [(corner_x + x * factor, top + y * factor) for x, y in corner]
+        first_return = ArcPath([entry, (corner_x, top), *corner[1:]])
         second_return = ArcPath([corner[-1], turn_start, *landing_turn[1:]])
         self.returns = (first_return, second_return)
         self.return_frames = tuple(math.ceil(path.length / self.step) for path in self.returns)
@@ -456,17 +463,30 @@ class Squadron:
                 if index == 0
                 else hashlib.sha256(f"{self.seed}:jet:{index}".encode()).hexdigest()
             )
-            flight = Flight(
-                calendar,
-                fps,
-                child_seed,
-                targets=targets[index::jets],
-                delay=delay,
-                jet_id=index,
-                carrier=carrier,
-            )
+
+            def plan(start_delay, index=index, child_seed=child_seed):
+                return Flight(
+                    calendar,
+                    fps,
+                    child_seed,
+                    targets=targets[index::jets],
+                    delay=start_delay,
+                    jet_id=index,
+                    carrier=carrier,
+                    deck_offset=((jets - 1) / 2 - index) * RUNWAY_SPACING,
+                )
+
+            flight = plan(delay)
+            if self.flights:
+                # Reserve the runway in launch order. Waiting on deck keeps
+                # airborne routes continuous and lets each arrival stop behind
+                # the previous jet, in the same slot it occupied at the start.
+                earliest = self.flights[-1].landed + max(1, round(0.35 * fps))
+                if flight.touchdown < earliest:
+                    delay += earliest - flight.touchdown
+                    flight = plan(delay)
             self.flights.append(flight)
-            # The next jet enters the catapult after the previous aircraft clears it.
+            # The next queued jet starts its roll after the runway is clear.
             delay = flight.launch_end + round(0.35 * fps) - round(0.4 * fps)
         self.strikes = sorted(
             (s for flight in self.flights for s in flight.strikes), key=lambda s: s.hit
@@ -491,10 +511,4 @@ class Squadron:
         return frame >= self.reset_start + (cell.column / 53) * self.reset_frames
 
     def visible_poses(self, frame):
-        if frame >= self.landed:
-            return (self.flights[0].pose(0),)
-        return tuple(
-            flight.pose(frame)
-            for index, flight in enumerate(self.flights)
-            if (index == 0 or frame >= self.flights[index - 1].launch_end) and frame < flight.landed
-        )
+        return tuple(flight.pose(frame) for flight in self.flights)

@@ -8,15 +8,15 @@ pixel explosions and a spinning radar. Runs with GitHub Actions.
 **Lincoln — default carrier**
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=water-bow-loop-20261102">
-  <img src="examples/demo/git-jet.gif?v=water-bow-loop-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier through rolling ocean water, with an angled runway, detailed island and spinning radar.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=runway-queue-20261102">
+  <img src="examples/demo/git-jet.gif?v=runway-queue-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier through rolling ocean water, with an angled runway, detailed island and spinning radar.">
 </picture>
 
 **Classic — original carrier**
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo-classic/git-jet.png?v=water-bow-loop-20261102">
-  <img src="examples/demo-classic/git-jet.gif?v=water-bow-loop-20261102" width="960" alt="The original ivory-island carrier with a spinning radar and flowing ocean wake launches a pixel jet to clear the commit calendar.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo-classic/git-jet.png?v=runway-queue-20261102">
+  <img src="examples/demo-classic/git-jet.gif?v=runway-queue-20261102" width="960" alt="The original ivory-island carrier with a spinning radar and flowing ocean wake launches a pixel jet to clear the commit calendar.">
 </picture>
 
 Choose `carrier: 'lincoln'` (default) or `carrier: 'classic'` in your workflow.
@@ -26,7 +26,7 @@ Choose `water: 'ocean'` (default) for the flowing ocean surface and wake, or
 `water: 'original'` for the original small wave patches. This works with either
 carrier. For the CLI, use `--water ocean` or `--water original`.
 
-Both demos use **56 synthetic commits across 14 active days**. Live mode uses your
+Both demos show **three jets** and **56 synthetic commits across 14 active days**. Live mode uses your
 actual data. **One attack clears one day cell**, regardless of that day's count.
 The jet returns to land, the calendar rebuilds, and the animation loops.
 
@@ -55,8 +55,11 @@ smooth curves at a steady cruise speed and fires while moving. The default is
 
 Set `jets: '2'` or `jets: '3'` to launch multiple jets and clear busy calendars
 faster. The default is `jets: '1'`. Jets share the day cells, so each active day
-is still attacked exactly once. Launches are staggered and the calendar resets
-after every jet lands. Small calendars may take a similar time because launch
+is still attacked exactly once. Jets line up visibly on the runway, launch one
+at a time and land in order, returning to their original runway spots. Waiting
+jets remain visible before takeoff and after landing. Launch timing keeps the
+runway clear for each arrival. The calendar resets after every jet lands.
+Small calendars may take a similar time because launch
 and return flights still need to finish. For the CLI, use `--jets 3`.
 
 GIFs over **25 MB** are automatically retried at a lower resolution, then lower

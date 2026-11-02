@@ -14,6 +14,7 @@ def main():
             calendar,
             root / "examples" / folder,
             Options(),
+            jets=3,
             carrier=carrier,
             seed="git-jet-loop",
             source="demo",
