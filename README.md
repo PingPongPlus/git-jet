@@ -108,6 +108,6 @@ never changes your default branch. Publishing requires `contents: write`.
 - [x] Catapult launch, banked flight, one attack per active day and carrier return.
 - [x] Optional 1–3 jets to share targets and shorten busy calendars.
 - [ ] Optional **one shot per individual commit** mode.
-- [ ] More carrier/jet designs and configurable graph palettes, with artwork approval.
+- [ ] More carrier/jet/runway designs and configurable graph palettes, with artwork approval.
 
 [Artwork approvals](artwork/APPROVAL.md) · [Contributing](CONTRIBUTING.md) · [MIT](LICENSE)
