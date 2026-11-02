@@ -36,7 +36,7 @@ class Options:
 
 def palette():
     samples = [
-        art.carrier_sprite(),
+        *(art.carrier_sprite(carrier=carrier) for carrier in art.CARRIERS),
         *(art.commit_tile(i) for i in range(5)),
         *(art.explosion_sprite(i / 10) for i in range(10)),
         *(art.jet_sprite(0, thrust, bank) for thrust in range(3) for bank in (-1, 0, 1)),
@@ -130,6 +130,7 @@ def export(
             "attacks": len(renderer.flight.strikes),
             "attack_mode": "day-cell",
             "jets": renderer.jet_count,
+            "carrier": renderer.carrier,
             "seed": renderer.flight.seed,
             "flights": [
                 {
@@ -179,6 +180,7 @@ def render_assets(
     options: Options,
     *,
     jets=1,
+    carrier=art.DEFAULT_CARRIER,
     seed=None,
     source="live",
     auto_compress=True,
@@ -191,7 +193,7 @@ def render_assets(
     attempt = 0
     for fps in rates:
         try:
-            renderer = Renderer(calendar, fps=fps, seed=seed, jets=jets)
+            renderer = Renderer(calendar, fps=fps, seed=seed, jets=jets, carrier=carrier)
             scales = (
                 range(options.scale, 0, -1)
                 if auto_compress and fps == options.fps

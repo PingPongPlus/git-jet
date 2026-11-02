@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("action_script", ROOT / "scripts/run_action.py")
 action = importlib.util.module_from_spec(spec)
@@ -17,6 +19,7 @@ def test_action_forwards_inputs_and_writes_only_successful_output(monkeypatch, t
     monkeypatch.setenv("JET_USERNAME", "octocat")
     monkeypatch.setenv("JET_DAYS", "30")
     monkeypatch.setenv("JET_JETS", "3")
+    monkeypatch.setenv("JET_CARRIER", "classic")
     monkeypatch.setenv("JET_AUTO_COMPRESS", "false")
     monkeypatch.setenv("JET_OUTPUT_DIR", "generated")
     monkeypatch.setenv("JET_SEED", "reproducible-action-route")
@@ -32,6 +35,7 @@ def test_action_forwards_inputs_and_writes_only_successful_output(monkeypatch, t
     assert args[args.index("--username") + 1] == "octocat"
     assert args[args.index("--days") + 1] == "30"
     assert args[args.index("--jets") + 1] == "3"
+    assert args[args.index("--carrier") + 1] == "classic"
     assert "--no-auto-compress" in args
     assert args[args.index("--seed") + 1] == "reproducible-action-route"
     outputs = dict(line.split("=", 1) for line in (tmp_path / "outputs").read_text().splitlines())
@@ -66,7 +70,8 @@ def test_action_does_not_publish_an_output_when_collection_fails(monkeypatch, tm
     assert not (tmp_path / "outputs").exists()
 
 
-def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path):
+@pytest.mark.parametrize("carrier", ("lincoln", "classic"))
+def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path, carrier):
     process = subprocess.run(
         [sys.executable, str(ROOT / "scripts/run_action.py")],
         env={
@@ -81,6 +86,7 @@ def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path):
             "JET_OUTPUT_DIR": "rendered",
             "JET_SEED": "action-smoke",
             "JET_JETS": "3",
+            "JET_CARRIER": carrier,
             "JET_AUTO_COMPRESS": "true",
             "GITHUB_TOKEN": "never-save-this-test-token",
         },
@@ -92,6 +98,7 @@ def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path):
     assert report["source"] == "demo" and report["attacks"] == 14
     assert report["seed"] == "action-smoke"
     assert report["jets"] == 3 and len(report["flights"]) == 3
+    assert report["carrier"] == carrier
     assert sum(f["attacks"] for f in report["flights"]) == report["attacks"]
     assert report["decoded_frames_match"]
     outputs = dict(line.split("=", 1) for line in (tmp_path / "outputs").read_text().splitlines())

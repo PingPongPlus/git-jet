@@ -4,7 +4,16 @@ import math
 
 from PIL import Image, ImageDraw
 
-from .art import CREAM, GOLD, carrier_sprite, commit_tile, explosion_sprite, jet_sprite
+from .art import (
+    CREAM,
+    DEFAULT_CARRIER,
+    GOLD,
+    carrier_sprite,
+    commit_tile,
+    explosion_sprite,
+    jet_sprite,
+    validate_carrier,
+)
 from .calendar import Calendar
 from .flight import (
     GRID_STEP,
@@ -20,16 +29,17 @@ from .flight import (
 
 
 class Renderer:
-    def __init__(self, calendar: Calendar, fps=20, seed=None, jets=1):
+    def __init__(self, calendar: Calendar, fps=20, seed=None, jets=1, carrier=DEFAULT_CARRIER):
         if type(jets) is not int or not 1 <= jets <= 3:
             raise ValueError("jets must be an integer in 1..3")
         self.jet_count = jets
+        self.carrier = validate_carrier(carrier)
         self.calendar = calendar
         self.cells = calendar.cells()
         self.flight = (
-            Flight(calendar, fps, seed=seed)
+            Flight(calendar, fps, seed=seed, carrier=self.carrier)
             if jets == 1
-            else Squadron(calendar, jets, fps, seed=seed)
+            else Squadron(calendar, jets, fps, seed=seed, carrier=self.carrier)
         )
         self.flights = (self.flight,) if jets == 1 else self.flight.flights
         self.frame_count = self.flight.frame_count
@@ -62,7 +72,7 @@ class Renderer:
         frame = frame_number % self.frame_count
         phase = frame / (self.flight.fps * 4)
         image = Image.new("RGBA", (WIDTH, HEIGHT))
-        image.alpha_composite(carrier_sprite(phase), (65, 12))
+        image.alpha_composite(carrier_sprite(phase, carrier=self.carrier), (65, 12))
         image.alpha_composite(self.grid_frame(frame))
         draw = ImageDraw.Draw(image)
         for strike in self.flight.strikes:

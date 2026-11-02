@@ -7,6 +7,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from .art import CARRIERS, DEFAULT_CARRIER
 from .calendar import Calendar
 from .demo import demo_calendar
 from .export import Options, render_assets
@@ -30,6 +31,12 @@ def main(argv=None):
     render.add_argument("--end-date", type=date.fromisoformat)
     render.add_argument("--scale", type=int, default=2)
     render.add_argument("--fps", type=int, default=20)
+    render.add_argument(
+        "--carrier",
+        choices=CARRIERS,
+        default=DEFAULT_CARRIER,
+        help="carrier artwork (default: lincoln)",
+    )
     render.add_argument(
         "--jets", type=int, choices=(1, 2, 3), default=1, help="simultaneous jets (default: 1)"
     )
@@ -70,6 +77,7 @@ def main(argv=None):
                 args.output_dir,
                 options,
                 jets=args.jets,
+                carrier=args.carrier,
                 seed=args.seed,
                 source=source_name,
                 auto_compress=args.auto_compress,

@@ -1,4 +1,4 @@
-"""Approved base sprites; the rotating radar is pending owner review."""
+"""Owner-approved Lincoln and Classic carriers, jets, radar and effects."""
 
 import math
 
@@ -16,6 +16,32 @@ WAVE = "#70b3ce"
 DEEP = "#39799c"
 FOAM = "#f1f4e8"
 GRID = ("#244252", "#28556d", "#39799c", "#70b3ce", "#bfe6eb")
+DEFAULT_CARRIER = "lincoln"
+CARRIERS = ("lincoln", "classic")
+
+
+def validate_carrier(carrier):
+    if not isinstance(carrier, str) or carrier not in CARRIERS:
+        raise ValueError("carrier must be lincoln or classic")
+    return carrier
+
+
+def carrier_launch_points(carrier=DEFAULT_CARRIER):
+    validate_carrier(carrier)
+    if carrier == "classic":
+        return (224, 33, 28), (-8, 32, 28)
+    from .lincoln import FLIGHT_BOW, FLIGHT_DECK
+
+    return FLIGHT_DECK, FLIGHT_BOW
+
+
+def carrier_radar_origin(carrier=DEFAULT_CARRIER):
+    validate_carrier(carrier)
+    if carrier == "classic":
+        return 185, 10, 60
+    from .lincoln import RADAR_ORIGIN
+
+    return RADAR_ORIGIN
 
 
 def project(u, v, z=0):
@@ -86,7 +112,16 @@ def radar_sprite(t=0):
     return image
 
 
-def carrier_sprite(t=0):
+def carrier_sprite(t=0, *, carrier=DEFAULT_CARRIER):
+    validate_carrier(carrier)
+    if carrier == "classic":
+        return classic_carrier_sprite(t)
+    from .lincoln import carrier_sprite as lincoln_carrier
+
+    return lincoln_carrier(t)
+
+
+def classic_carrier_sprite(t=0):
     image = Image.new("RGBA", (350, 190))
     draw = ImageDraw.Draw(image)
 
@@ -311,8 +346,6 @@ def carrier_sprite(t=0):
     draw.line((x + 1, y - 2, x + 1, y - 20), fill=LIGHT)
     draw.line((x - 9, y - 12, x + 8, y - 12), fill=SHADE)
     image.alpha_composite(radar_sprite(t), (x - 7, y - 23))
-    draw.line((x - 3, y - 22, x - 3, y - 25), fill=LIGHT)
-    draw.point((x - 3, y - 26), fill=GOLD)
     draw.line((x + 6, y - 9, x + 6, y - 15), fill=LIGHT)
     draw.line((x - 7, y - 4, x + 7, y - 4), fill=STEEL)
     draw.line((x - 6, y - 4, x - 3, y - 9), fill=LIGHT)

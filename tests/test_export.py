@@ -11,8 +11,9 @@ from git_jet.render import Renderer
 
 
 @pytest.mark.parametrize("jets", (1, 3))
+@pytest.mark.parametrize("carrier", ("lincoln", "classic"))
 def test_real_cached_calendar_exports_exact_frames_without_network(
-    tmp_path, monkeypatch, capsys, jets
+    tmp_path, monkeypatch, capsys, jets, carrier
 ):
     def forbidden(*args, **kwargs):
         raise AssertionError("cached or demo rendering must not use the network")
@@ -35,6 +36,8 @@ def test_real_cached_calendar_exports_exact_frames_without_network(
                 "1",
                 "--jets",
                 str(jets),
+                "--carrier",
+                carrier,
                 "--output-dir",
                 str(output),
             ]
@@ -47,9 +50,10 @@ def test_real_cached_calendar_exports_exact_frames_without_network(
     assert report["decoded_frames_match"] and report["transparent"]
     assert report["source"] == "cache"
     assert report["jets"] == jets and len(report["flights"]) == jets
+    assert report["carrier"] == carrier
     assert sum(f["attacks"] for f in report["flights"]) == 2
     assert {t["jet"] for t in report["targets"]}.issubset(set(range(1, jets + 1)))
-    renderer = Renderer(calendar, jets=jets, seed=report["seed"])
+    renderer = Renderer(calendar, jets=jets, seed=report["seed"], carrier=carrier)
     with Image.open(output / "git-jet.png") as png:
         assert png.tobytes() == renderer.frame(0).tobytes()
         assert set(png.getchannel("A").tobytes()) == {0, 255}

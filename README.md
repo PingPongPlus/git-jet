@@ -1,15 +1,27 @@
 # Git Jet
 
-A pixel jet(multiple jets also possible) launches from a carrier, banks over your real commit calendar, and
-destroys each active day's cell. Transparent background, waves, projectiles and
-pixel explosions and a continuously spinning carrier radar. Runs with GitHub Actions.
+One to three pixel jets launch from a carrier, bank over your real commit calendar,
+and destroy each active day's cell. Transparent background, waves, projectiles,
+pixel explosions and a spinning radar. Runs with GitHub Actions.
+
+**Lincoln — default carrier**
 
 <picture>
-  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=radar-spinner-20261102">
-  <img src="examples/demo/git-jet.gif?v=radar-spinner-20261102" width="960" alt="A pixel jet launches from an angled carrier with a spinning radar, loops while firing and clears the commit calendar below it.">
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo/git-jet.png?v=carriers-20261102">
+  <img src="examples/demo/git-jet.gif?v=carriers-20261102" width="960" alt="A pixel jet launches from a Lincoln-inspired carrier with an angled runway, detailed island and spinning radar.">
 </picture>
 
-The demo uses **56 synthetic commits across 14 active days**. Live mode uses your
+**Classic — original carrier**
+
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" srcset="examples/demo-classic/git-jet.png?v=carriers-20261102">
+  <img src="examples/demo-classic/git-jet.gif?v=carriers-20261102" width="960" alt="The original ivory-island carrier with a spinning radar launches a pixel jet to clear the commit calendar.">
+</picture>
+
+Choose `carrier: 'lincoln'` (default) or `carrier: 'classic'` in your workflow.
+For the CLI, use `--carrier classic`. Both designs have the spinning radar.
+
+Both demos use **56 synthetic commits across 14 active days**. Live mode uses your
 actual data. **One attack clears one day cell**, regardless of that day's count.
 The jet returns to land, the calendar rebuilds, and the animation loops.
 
@@ -59,7 +71,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
 git-jet render --demo --output-dir out/demo
-git-jet render --username YOUR_USERNAME --days 365 --output-dir out/live
+git-jet render --username YOUR_USERNAME --days 365 --carrier lincoln --output-dir out/live
 ```
 
 For offline real-data rendering, use `--calendar out/live/calendar.json`.

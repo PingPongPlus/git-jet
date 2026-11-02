@@ -14,7 +14,7 @@ def main():
     region = (x - 12, y - 31, x + 12, y + 1)
     frames = []
     for frame in range(80):
-        carrier = carrier_sprite(frame / 80)
+        carrier = carrier_sprite(frame / 80, carrier="classic")
         image = Image.new("RGB", (960, 400), "#0d1117")
         full = carrier.resize((700, 380), Image.Resampling.NEAREST)
         image.paste(full, (0, 10), full)
@@ -35,7 +35,11 @@ def main():
     )
     sheet = Image.new("RGB", (640, 380), "#0d1117")
     for index in range(8):
-        detail = carrier_sprite(index / 8).crop(region).resize((120, 160), Image.Resampling.NEAREST)
+        detail = (
+            carrier_sprite(index / 8, carrier="classic")
+            .crop(region)
+            .resize((120, 160), Image.Resampling.NEAREST)
+        )
         left, top = (index % 4) * 160 + 20, (index // 4) * 190 + 20
         sheet.paste(detail, (left, top), detail)
         ImageDraw.Draw(sheet).text((left, top - 16), f"{index * 45} degrees", fill=CREAM)

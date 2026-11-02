@@ -1,0 +1,172 @@
+{
+  "username": "git-jet",
+  "source": "demo",
+  "scope": "public-owned-default-branches",
+  "start_date": "2025-11-02",
+  "end_date": "2026-11-01",
+  "days": 365,
+  "total_commits": 56,
+  "active_days": 14,
+  "attacks": 14,
+  "attack_mode": "day-cell",
+  "jets": 1,
+  "carrier": "classic",
+  "seed": "git-jet-loop",
+  "flights": [
+    {
+      "jet": 1,
+      "seed": "git-jet-loop",
+      "attacks": 14,
+      "launch_frame": 8,
+      "landed_frame": 480
+    }
+  ],
+  "maneuvers": [
+    {
+      "kind": "loop",
+      "direction": -1,
+      "start_frame": 244,
+      "end_frame": 289
+    }
+  ],
+  "width": 960,
+  "height": 640,
+  "scale": 2,
+  "requested_scale": 2,
+  "requested_fps": 20,
+  "auto_compressed": false,
+  "frames": 560,
+  "fps": 20,
+  "duration_seconds": 28.0,
+  "transparent": true,
+  "decoded_frames_match": true,
+  "gif_bytes": 8407801,
+  "targets": [
+    {
+      "date": "2026-10-18",
+      "jet": 1,
+      "commits": 6,
+      "column": 50,
+      "row": 0,
+      "fire_frame": 189,
+      "hit_frame": 196
+    },
+    {
+      "date": "2026-10-30",
+      "jet": 1,
+      "commits": 7,
+      "column": 51,
+      "row": 5,
+      "fire_frame": 197,
+      "hit_frame": 203
+    },
+    {
+      "date": "2026-09-30",
+      "jet": 1,
+      "commits": 5,
+      "column": 47,
+      "row": 3,
+      "fire_frame": 201,
+      "hit_frame": 207
+    },
+    {
+      "date": "2026-09-01",
+      "jet": 1,
+      "commits": 4,
+      "column": 43,
+      "row": 2,
+      "fire_frame": 208,
+      "hit_frame": 214
+    },
+    {
+      "date": "2026-08-03",
+      "jet": 1,
+      "commits": 3,
+      "column": 39,
+      "row": 1,
+      "fire_frame": 216,
+      "hit_frame": 222
+    },
+    {
+      "date": "2026-07-02",
+      "jet": 1,
+      "commits": 2,
+      "column": 34,
+      "row": 4,
+      "fire_frame": 222,
+      "hit_frame": 227
+    },
+    {
+      "date": "2026-04-12",
+      "jet": 1,
+      "commits": 6,
+      "column": 23,
+      "row": 0,
+      "fire_frame": 241,
+      "hit_frame": 248
+    },
+    {
+      "date": "2026-03-16",
+      "jet": 1,
+      "commits": 5,
+      "column": 19,
+      "row": 1,
+      "fire_frame": 247,
+      "hit_frame": 253
+    },
+    {
+      "date": "2026-05-10",
+      "jet": 1,
+      "commits": 7,
+      "column": 27,
+      "row": 0,
+      "fire_frame": 271,
+      "hit_frame": 277
+    },
+    {
+      "date": "2026-06-03",
+      "jet": 1,
+      "commits": 1,
+      "column": 30,
+      "row": 3,
+      "fire_frame": 277,
+      "hit_frame": 283
+    },
+    {
+      "date": "2026-02-04",
+      "jet": 1,
+      "commits": 4,
+      "column": 13,
+      "row": 3,
+      "fire_frame": 301,
+      "hit_frame": 307
+    },
+    {
+      "date": "2026-01-13",
+      "jet": 1,
+      "commits": 3,
+      "column": 10,
+      "row": 2,
+      "fire_frame": 307,
+      "hit_frame": 313
+    },
+    {
+      "date": "2025-12-16",
+      "jet": 1,
+      "commits": 2,
+      "column": 6,
+      "row": 2,
+      "fire_frame": 313,
+      "hit_frame": 319
+    },
+    {
+      "date": "2025-11-16",
+      "jet": 1,
+      "commits": 1,
+      "column": 2,
+      "row": 0,
+      "fire_frame": 322,
+      "hit_frame": 329
+    }
+  ]
+}

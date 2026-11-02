@@ -69,11 +69,18 @@ def test_production_art_preserves_approved_studies_outside_the_rotating_radar():
     approved = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(approved)
     with Image.open(ROOT / "artwork/drafts/output/carrier-transparent.png") as reference:
-        assert art.carrier_sprite().tobytes() == reference.tobytes()
-    for phase in (0, 0.12, 0.5, 0.95):
-        current, original = art.carrier_sprite(phase), approved.carrier_sprite(phase)
+        reference = reference.copy()
         x, y = art.project(185, 10, 60)
-        radar = (x - 7, y - 23, x + 9, y - 12)
+        # The owner requested removal of this detached five-pixel aerial.
+        reference.paste((0, 0, 0, 0), (x - 3, y - 26, x - 2, y - 21))
+        assert art.carrier_sprite(carrier="classic").tobytes() == reference.tobytes()
+    for phase in (0, 0.12, 0.5, 0.95):
+        current, original = (
+            art.carrier_sprite(phase, carrier="classic"),
+            approved.carrier_sprite(phase),
+        )
+        x, y = art.project(185, 10, 60)
+        radar = (x - 7, y - 27, x + 9, y - 12)
         original.paste(current.crop(radar), radar[:2])
         assert current.tobytes() == original.tobytes()
     for heading in (i * 22.5 for i in range(16)):

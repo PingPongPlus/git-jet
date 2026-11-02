@@ -9,7 +9,7 @@ import random
 import secrets
 from dataclasses import dataclass
 
-from .art import project
+from .art import DEFAULT_CARRIER, carrier_launch_points, project
 from .calendar import Calendar, Cell
 from .limits import FrameLimitError
 
@@ -236,15 +236,27 @@ class Strike:
 
 
 class Flight:
-    def __init__(self, calendar: Calendar, fps=20, seed=None, *, targets=None, delay=0, jet_id=0):
+    def __init__(
+        self,
+        calendar: Calendar,
+        fps=20,
+        seed=None,
+        *,
+        targets=None,
+        delay=0,
+        jet_id=0,
+        carrier=DEFAULT_CARRIER,
+    ):
         self.fps = fps
+        deck_point, bow_point = carrier_launch_points(carrier)
+        self.carrier = carrier
         self.seed = route_seed(seed)
         self.jet_id = jet_id
         rng = random.Random(self.seed)
         top = rng.uniform(201, 207)
         height = rng.uniform(68, 76)
-        sx, sy = project(224, 33, 28)
-        bx, by = project(-8, 32, 28)
+        sx, sy = project(*deck_point)
+        bx, by = project(*bow_point)
         self.deck, self.bow = (65 + sx, 12 + sy), (65 + bx, 12 + by)
         self.runway = unit((bx - sx, by - sy))
         self.takeoff_heading = heading(self.runway)
@@ -422,10 +434,14 @@ class Flight:
 class Squadron:
     """Share day-cell targets across independently seeded, staggered sorties."""
 
-    def __init__(self, calendar: Calendar, jets: int, fps=20, seed=None):
+    def __init__(
+        self, calendar: Calendar, jets: int, fps=20, seed=None, *, carrier=DEFAULT_CARRIER
+    ):
         if type(jets) is not int or not 1 <= jets <= 3:
             raise ValueError("jets must be an integer in 1..3")
         self.fps = fps
+        carrier_launch_points(carrier)
+        self.carrier = carrier
         self.seed = route_seed(seed)
         targets = [c for c in calendar.cells() if c.day and c.day.commits]
         self.flights = []
@@ -443,6 +459,7 @@ class Squadron:
                 targets=targets[index::jets],
                 delay=delay,
                 jet_id=index,
+                carrier=carrier,
             )
             self.flights.append(flight)
             # The next jet enters the catapult after the previous aircraft clears it.

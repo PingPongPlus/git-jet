@@ -27,6 +27,9 @@ jobs:
   action-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      matrix:
+        carrier: [lincoln, classic]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -38,6 +41,7 @@ jobs:
           scale: '1'
           seed: action-smoke
           jets: '3'
+          carrier: ${{ matrix.carrier }}
           output-dir: action-smoke
           token: ''
       - name: Verify generated paths
@@ -51,5 +55,5 @@ jobs:
           test -s "$JET_CALENDAR"
       - uses: actions/upload-artifact@v7
         with:
-          name: git-jet-demo
+          name: git-jet-demo-${{ matrix.carrier }}
           path: action-smoke/

@@ -44,6 +44,7 @@ def test_live_render_automatically_fits_without_recollecting_or_skipping_targets
     assert report["auto_compressed"] and report["requested_scale"] == 2 and report["scale"] == 1
     assert report["requested_fps"] == report["fps"] == 20
     assert report["seed"] == "git-jet-loop" and report["source"] == "live"
+    assert report["carrier"] == "lincoln"
     assert report["attacks"] == report["active_days"] == 14
     assert sum(t["commits"] for t in report["targets"]) == calendar.total
     assert len({t["date"] for t in report["targets"]}) == 14
@@ -93,6 +94,7 @@ def test_scale_is_reduced_before_fps_with_one_fresh_seed_and_all_targets(monkeyp
         attempts.append(options)
         assert renderer.calendar is calendar
         assert renderer.flight.seed == "keep-this-route" and renderer.jet_count == 3
+        assert renderer.carrier == "classic"
         assert len(renderer.flight.strikes) == 14
         assert sum(s.cell.day.commits for s in renderer.flight.strikes) == calendar.total
         if options.fps == 20:
@@ -101,7 +103,7 @@ def test_scale_is_reduced_before_fps_with_one_fresh_seed_and_all_targets(monkeyp
 
     monkeypatch.setattr("git_jet.flight.secrets.token_hex", fresh_seed)
     monkeypatch.setattr(exporter, "export", fit)
-    assert render_assets(calendar, tmp_path, Options(), jets=3) == {"fps": 10}
+    assert render_assets(calendar, tmp_path, Options(), jets=3, carrier="classic") == {"fps": 10}
     assert attempts == [Options(2, 20), Options(1, 20), Options(1, 10)]
     assert len(seeds) == 1
 
