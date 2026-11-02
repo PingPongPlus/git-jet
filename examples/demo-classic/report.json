@@ -9,7 +9,7 @@
   "active_days": 14,
   "attacks": 14,
   "attack_mode": "day-cell",
-  "jets": 1,
+  "jets": 3,
   "carrier": "classic",
   "water": "ocean",
   "seed": "git-jet-loop",
@@ -17,17 +17,39 @@
     {
       "jet": 1,
       "seed": "git-jet-loop",
-      "attacks": 14,
+      "attacks": 5,
       "launch_frame": 8,
-      "landed_frame": 480
+      "landed_frame": 464
+    },
+    {
+      "jet": 2,
+      "seed": "c00aa13156cdeac3fb98d0a11caf2c029fe45633b0fc5c66151bd6697d2bd51b",
+      "attacks": 5,
+      "launch_frame": 72,
+      "landed_frame": 533
+    },
+    {
+      "jet": 3,
+      "seed": "cfeb2707ba3fdf21e2c2ba11b9914dc444d464190efe3c955fe1f6578640abfd",
+      "attacks": 4,
+      "launch_frame": 149,
+      "landed_frame": 562
     }
   ],
   "maneuvers": [
     {
       "kind": "loop",
       "direction": -1,
-      "start_frame": 244,
-      "end_frame": 289
+      "start_frame": 209,
+      "end_frame": 253,
+      "jet": 1
+    },
+    {
+      "kind": "loop",
+      "direction": -1,
+      "start_frame": 285,
+      "end_frame": 331,
+      "jet": 2
     }
   ],
   "width": 960,
@@ -36,12 +58,12 @@
   "requested_scale": 2,
   "requested_fps": 20,
   "auto_compressed": false,
-  "frames": 560,
+  "frames": 640,
   "fps": 20,
-  "duration_seconds": 28.0,
+  "duration_seconds": 32.0,
   "transparent": true,
   "decoded_frames_match": true,
-  "gif_bytes": 14334512,
+  "gif_bytes": 16526574,
   "targets": [
     {
       "date": "2026-10-18",
@@ -49,35 +71,8 @@
       "commits": 6,
       "column": 50,
       "row": 0,
-      "fire_frame": 189,
-      "hit_frame": 196
-    },
-    {
-      "date": "2026-10-30",
-      "jet": 1,
-      "commits": 7,
-      "column": 51,
-      "row": 5,
-      "fire_frame": 197,
-      "hit_frame": 203
-    },
-    {
-      "date": "2026-09-30",
-      "jet": 1,
-      "commits": 5,
-      "column": 47,
-      "row": 3,
-      "fire_frame": 201,
-      "hit_frame": 207
-    },
-    {
-      "date": "2026-09-01",
-      "jet": 1,
-      "commits": 4,
-      "column": 43,
-      "row": 2,
-      "fire_frame": 208,
-      "hit_frame": 214
+      "fire_frame": 154,
+      "hit_frame": 161
     },
     {
       "date": "2026-08-03",
@@ -85,35 +80,8 @@
       "commits": 3,
       "column": 39,
       "row": 1,
-      "fire_frame": 216,
-      "hit_frame": 222
-    },
-    {
-      "date": "2026-07-02",
-      "jet": 1,
-      "commits": 2,
-      "column": 34,
-      "row": 4,
-      "fire_frame": 222,
-      "hit_frame": 227
-    },
-    {
-      "date": "2026-04-12",
-      "jet": 1,
-      "commits": 6,
-      "column": 23,
-      "row": 0,
-      "fire_frame": 241,
-      "hit_frame": 248
-    },
-    {
-      "date": "2026-03-16",
-      "jet": 1,
-      "commits": 5,
-      "column": 19,
-      "row": 1,
-      "fire_frame": 247,
-      "hit_frame": 253
+      "fire_frame": 181,
+      "hit_frame": 187
     },
     {
       "date": "2026-05-10",
@@ -121,17 +89,26 @@
       "commits": 7,
       "column": 27,
       "row": 0,
-      "fire_frame": 271,
-      "hit_frame": 277
+      "fire_frame": 236,
+      "hit_frame": 242
     },
     {
-      "date": "2026-06-03",
-      "jet": 1,
-      "commits": 1,
-      "column": 30,
-      "row": 3,
-      "fire_frame": 277,
-      "hit_frame": 283
+      "date": "2026-10-30",
+      "jet": 2,
+      "commits": 7,
+      "column": 51,
+      "row": 5,
+      "fire_frame": 240,
+      "hit_frame": 246
+    },
+    {
+      "date": "2026-09-01",
+      "jet": 2,
+      "commits": 4,
+      "column": 43,
+      "row": 2,
+      "fire_frame": 253,
+      "hit_frame": 259
     },
     {
       "date": "2026-02-04",
@@ -139,26 +116,17 @@
       "commits": 4,
       "column": 13,
       "row": 3,
-      "fire_frame": 301,
-      "hit_frame": 307
+      "fire_frame": 266,
+      "hit_frame": 272
     },
     {
-      "date": "2026-01-13",
-      "jet": 1,
-      "commits": 3,
-      "column": 10,
-      "row": 2,
-      "fire_frame": 307,
-      "hit_frame": 313
-    },
-    {
-      "date": "2025-12-16",
-      "jet": 1,
-      "commits": 2,
-      "column": 6,
-      "row": 2,
-      "fire_frame": 313,
-      "hit_frame": 319
+      "date": "2026-04-12",
+      "jet": 3,
+      "commits": 6,
+      "column": 23,
+      "row": 0,
+      "fire_frame": 271,
+      "hit_frame": 278
     },
     {
       "date": "2025-11-16",
@@ -166,8 +134,62 @@
       "commits": 1,
       "column": 2,
       "row": 0,
-      "fire_frame": 322,
-      "hit_frame": 329
+      "fire_frame": 287,
+      "hit_frame": 294
+    },
+    {
+      "date": "2026-03-16",
+      "jet": 2,
+      "commits": 5,
+      "column": 19,
+      "row": 1,
+      "fire_frame": 291,
+      "hit_frame": 297
+    },
+    {
+      "date": "2026-06-03",
+      "jet": 2,
+      "commits": 1,
+      "column": 30,
+      "row": 3,
+      "fire_frame": 319,
+      "hit_frame": 325
+    },
+    {
+      "date": "2026-09-30",
+      "jet": 3,
+      "commits": 5,
+      "column": 47,
+      "row": 3,
+      "fire_frame": 337,
+      "hit_frame": 343
+    },
+    {
+      "date": "2026-07-02",
+      "jet": 3,
+      "commits": 2,
+      "column": 34,
+      "row": 4,
+      "fire_frame": 358,
+      "hit_frame": 364
+    },
+    {
+      "date": "2025-12-16",
+      "jet": 2,
+      "commits": 2,
+      "column": 6,
+      "row": 2,
+      "fire_frame": 360,
+      "hit_frame": 366
+    },
+    {
+      "date": "2026-01-13",
+      "jet": 3,
+      "commits": 3,
+      "column": 10,
+      "row": 2,
+      "fire_frame": 398,
+      "hit_frame": 404
     }
   ]
 }

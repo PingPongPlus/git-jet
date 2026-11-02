@@ -29,7 +29,9 @@ def validate_carrier(carrier):
 def carrier_launch_points(carrier=DEFAULT_CARRIER):
     validate_carrier(carrier)
     if carrier == "classic":
-        return (224, 33, 28), (-8, 32, 28)
+        # Keep the 55-pixel landing roll on the deck, with room for a queue
+        # on either side of the central launch/parking position.
+        return (168, 33, 28), (-8, 32, 28)
     from .lincoln import flight_anchors
 
     return flight_anchors()
