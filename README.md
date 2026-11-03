@@ -35,17 +35,22 @@ The jet returns to land, the calendar rebuilds, and the animation loops.
 1. Copy [this workflow](examples/profile-workflow.yml) into your profile repository
    as `.github/workflows/git-jet.yml`.
 2. Open **Actions → Git Jet → Run workflow**. It publishes images to `output`.
-3. Add this to your README, replacing both `YOUR_USERNAME` values:
+3. Add this to your README, replacing `YOUR_USERNAME` with your GitHub username:
 
 ```html
-<picture>
-  <source media="(prefers-reduced-motion: no-preference)"
-    srcset="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/output/git-jet.gif">
-  <img width="960"
-    src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/output/git-jet.png"
-    alt="My commit history cleared by a pixel jet">
-</picture>
+<a href="https://github.com/PingPongPlus/git-jet">
+  <picture>
+    <source media="(prefers-reduced-motion: no-preference)"
+      srcset="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/output/git-jet.gif">
+    <img width="960"
+      src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/output/git-jet.png"
+      alt="My commit history cleared by a pixel jet">
+  </picture>
+</a>
 ```
+
+Clicking the animation or its static fallback opens the Git Jet repository.
+Existing users can replace their image block with this snippet to add the link.
 
 Updates run **daily**. Set `days: '30'`, `'7'` or `'365'` under the generation
 step's `with:` section. The static PNG preserves the full calendar. Flight uses
