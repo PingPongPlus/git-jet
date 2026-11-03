@@ -12,6 +12,7 @@
   "jets": 3,
   "carrier": "classic",
   "water": "ocean",
+  "graph_theme": "github",
   "seed": "git-jet-loop",
   "flights": [
     {
@@ -63,7 +64,7 @@
   "duration_seconds": 32.0,
   "transparent": true,
   "decoded_frames_match": true,
-  "gif_bytes": 16526574,
+  "gif_bytes": 16553060,
   "targets": [
     {
       "date": "2026-10-18",

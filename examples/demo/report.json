@@ -12,6 +12,7 @@
   "jets": 3,
   "carrier": "lincoln",
   "water": "ocean",
+  "graph_theme": "blue",
   "seed": "git-jet-loop",
   "flights": [
     {
