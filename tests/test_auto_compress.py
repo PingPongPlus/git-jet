@@ -98,6 +98,7 @@ def test_scale_is_reduced_before_fps_with_one_fresh_seed_and_all_targets(monkeyp
         assert renderer.flight.seed == "keep-this-route" and renderer.jet_count == 3
         assert renderer.carrier == "classic"
         assert renderer.water == "original"
+        assert renderer.graph_theme == "github"
         assert len(renderer.flight.strikes) == 14
         assert sum(s.cell.day.commits for s in renderer.flight.strikes) == calendar.total
         if options.fps == 20:
@@ -107,7 +108,13 @@ def test_scale_is_reduced_before_fps_with_one_fresh_seed_and_all_targets(monkeyp
     monkeypatch.setattr("git_jet.flight.secrets.token_hex", fresh_seed)
     monkeypatch.setattr(exporter, "export", fit)
     assert render_assets(
-        calendar, tmp_path, Options(), jets=3, carrier="classic", water="original"
+        calendar,
+        tmp_path,
+        Options(),
+        jets=3,
+        carrier="classic",
+        water="original",
+        graph_theme="github",
     ) == {"fps": 10}
     assert attempts == [Options(2, 20), Options(1, 20), Options(1, 10)]
     assert len(seeds) == 1
