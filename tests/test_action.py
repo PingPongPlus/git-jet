@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from git_jet.demo import demo_calendar
+
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("action_script", ROOT / "scripts/run_action.py")
 action = importlib.util.module_from_spec(spec)
@@ -77,6 +79,8 @@ def test_action_does_not_publish_an_output_when_collection_fails(monkeypatch, tm
 @pytest.mark.parametrize("carrier", ("lincoln", "classic"))
 @pytest.mark.parametrize("water", ("ocean", "original"))
 def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path, carrier, water):
+    calendar = demo_calendar()
+    expected_dates = {day.date.isoformat() for day in calendar.days if day.commits}
     process = subprocess.run(
         [sys.executable, str(ROOT / "scripts/run_action.py")],
         env={
@@ -102,7 +106,9 @@ def test_actual_action_script_generates_demo_assets_and_returns_paths(tmp_path, 
     )
     assert process.returncode == 0, process.stderr
     report = json.loads(process.stdout)
-    assert report["source"] == "demo" and report["attacks"] == 14
+    assert report["source"] == "demo" and report["attacks"] == len(expected_dates)
+    assert report["total_commits"] == calendar.total
+    assert {target["date"] for target in report["targets"]} == expected_dates
     assert report["seed"] == "action-smoke"
     assert report["jets"] == 3 and len(report["flights"]) == 3
     assert report["carrier"] == carrier
